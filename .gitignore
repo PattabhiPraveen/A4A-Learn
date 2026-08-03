@@ -1,0 +1,6 @@
+datasets/
+models/
+.venv/
+node_modules/
+logs/
+.env
