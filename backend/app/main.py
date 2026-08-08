@@ -19,7 +19,7 @@ app.include_router(api_router)
 async def startup():
     logger.info("Starting A4A Learn Backend...")
 
-    init_db()
+   # init_db()
 
     logger.info("Database Initialized")
 
