@@ -1,19 +1,33 @@
 from functools import lru_cache
+from pathlib import Path
 
 from sentence_transformers import SentenceTransformer
 
 
-MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
+
+MODEL_PATH = (
+    PROJECT_ROOT
+    / "models"
+    / "embeddings"
+    / "all-MiniLM-L6-v2"
+)
 
 
 @lru_cache(maxsize=1)
 def get_embedding_model() -> SentenceTransformer:
     """
-    Load the embedding model once and reuse it.
+    Load the local embedding model once and reuse it.
     """
 
+    if not MODEL_PATH.exists():
+        raise FileNotFoundError(
+            f"Local embedding model not found: {MODEL_PATH}"
+        )
+
     return SentenceTransformer(
-        MODEL_NAME
+        str(MODEL_PATH),
+        local_files_only=True,
     )
 
 
