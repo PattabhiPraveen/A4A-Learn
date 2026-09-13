@@ -1,0 +1,47 @@
+[
+  {
+    "id": "Q001",
+    "query": "What is sign language?",
+    "expected_document": "lesson_01"
+  },
+  {
+    "id": "Q002",
+    "query": "How is sign language different from spoken language?",
+    "expected_document": "lesson_01"
+  },
+  {
+    "id": "Q003",
+    "query": "What is Indian Sign Language?",
+    "expected_document": "lesson_01"
+  },
+  {
+    "id": "Q004",
+    "query": "How does sign language support deaf learners?",
+    "expected_document": "lesson_01"
+  },
+  {
+    "id": "Q005",
+    "query": "What should a beginner learn first in Indian Sign Language?",
+    "expected_document": "lesson_02"
+  },
+  {
+    "id": "Q006",
+    "query": "Why is visual observation important when learning signs?",
+    "expected_document": "lesson_02"
+  },
+  {
+    "id": "Q007",
+    "query": "Why should learners practise hand shapes and movement?",
+    "expected_document": "lesson_02"
+  },
+  {
+    "id": "Q008",
+    "query": "How can a student improve signing accuracy?",
+    "expected_document": "lesson_02"
+  },
+  {
+    "id": "Q009",
+    "query": "How should a beginner learn Indian Sign Language?",
+    "expected_document": "lesson_02"
+  }
+]

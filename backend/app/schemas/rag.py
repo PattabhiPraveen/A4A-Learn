@@ -1,3 +1,5 @@
+﻿import uuid
+
 from pydantic import BaseModel, Field
 
 
@@ -19,3 +21,12 @@ class RAGResponse(BaseModel):
     answer: str
     grounded: bool
     sources: list[RAGSource]
+
+    # Runtime HITL workflow state.
+    #
+    # These fields describe the governed workflow around
+    # the RAG result. They do not modify the RAG evidence.
+    workflow_decision: str = "continue"
+    escalation_reason: str = "normal"
+    requires_human_review: bool = False
+    review_id: uuid.UUID | None = None
