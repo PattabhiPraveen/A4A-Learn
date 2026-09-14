@@ -1,4 +1,4 @@
-# **A4A Learn — Accessibility for All Learn**
+# **A4A Learn — AI for All Learn**
 
 > An AI-powered accessible learning platform for deaf and hard-of-hearing learners, combining curriculum-grounded Generative AI, Indian Sign Language learning, learner progress tracking, Responsible AI controls, and human-in-the-loop teacher support.
 
@@ -6,7 +6,7 @@
 
 ## **1. Overview**
 
-**A4A Learn (Accessibility for All Learn)** is an M.Tech research and MVP project focused on improving accessible digital learning experiences for deaf and hard-of-hearing learners.
+**A4A Learn (AI for All Learn)** is an M.Tech research and MVP project focused on improving accessible digital learning experiences for deaf and hard-of-hearing learners.
 
 The project explores how Generative AI, Retrieval-Augmented Generation (RAG), Indian Sign Language (ISL) recognition, learner analytics, and human oversight can be integrated into a single learning platform.
 
@@ -583,4 +583,4 @@ See the repository LICENSE file for the applicable project licensing terms.
 
 A4A Learn is being developed as an academic research and engineering project with the objective of exploring how trustworthy and accessible AI can improve learning experiences for deaf and hard-of-hearing learners.
 
-Accessibility for All Learn — Learning should adapt to the learner, not the other way around.
+AI for All Learn — Learning should adapt to the learner, not the other way around.
