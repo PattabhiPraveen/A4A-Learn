@@ -36,13 +36,11 @@ def chunk_text(
     start = 0
     chunk_number = 0
 
-    text_length = len(text)
-
-    while start < text_length:
+    while start < len(text):
 
         end = min(
             start + chunk_size,
-            text_length,
+            len(text),
         )
 
         chunk = text[start:end].strip()
@@ -58,6 +56,21 @@ def chunk_text(
                 extension=metadata.get("extension"),
             )
 
+            # Preserve governed curriculum metadata separately
+            # from the text used for semantic embeddings.
+            for key in (
+                "filename",
+                "id",
+                "course",
+                "level",
+                "sequence",
+                "estimated_minutes",
+            ):
+                value = metadata.get(key)
+
+                if value is not None:
+                    chunk_metadata[key] = value
+
             chunks.append(
                 TextChunk(
                     chunk_id=f"{document_id}_{chunk_number}",
@@ -67,7 +80,7 @@ def chunk_text(
                 )
             )
 
-        if end >= text_length:
+        if end >= len(text):
             break
 
         start = end - overlap

@@ -1,4 +1,5 @@
 ﻿import uuid
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -11,9 +12,26 @@ class RAGQuestion(BaseModel):
 
 
 class RAGSource(BaseModel):
+    """
+    Evidence provenance returned with a RAG answer.
+
+    Curriculum evidence may carry a vector-retrieval
+    distance.
+
+    External web evidence does not have an equivalent
+    vector distance, so distance is None.
+    """
+
     title: str
+
     source: str | None = None
-    distance: float
+
+    distance: float | None = None
+
+    source_type: Literal[
+        "curriculum",
+        "web",
+    ] = "curriculum"
 
 
 class RAGResponse(BaseModel):

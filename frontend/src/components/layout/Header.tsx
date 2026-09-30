@@ -7,6 +7,46 @@ import {
   useAuth,
 } from "../../contexts/AuthContext";
 
+import type {
+  AccessibilityProfile,
+} from "../../types/auth";
+
+interface AccessibilityLabel {
+  shortLabel: string;
+  ariaLabel: string;
+}
+
+function getAccessibilityLabel(
+  profile: AccessibilityProfile,
+): AccessibilityLabel | null {
+  switch (profile) {
+    case "deaf":
+      return {
+        shortLabel: "Deaf Learner",
+        ariaLabel:
+          "Accessibility profile: Deaf learner",
+      };
+
+    case "hard_of_hearing":
+      return {
+        shortLabel: "Hard of Hearing Learner",
+        ariaLabel:
+          "Accessibility profile: Hard of Hearing learner",
+      };
+
+    case "non_speaking":
+      return {
+        shortLabel: "Non-speaking Learner",
+        ariaLabel:
+          "Accessibility profile: Non-speaking learner",
+      };
+
+    case "standard":
+    default:
+      return null;
+  }
+}
+
 export default function Header() {
   const {
     user,
@@ -16,8 +56,15 @@ export default function Header() {
 
   const navigate = useNavigate();
 
+  const accessibilityLabel = user
+    ? getAccessibilityLabel(
+        user.accessibility_profile,
+      )
+    : null;
+
   function handleLogout() {
     logout();
+
     navigate("/", {
       replace: true,
     });
@@ -72,6 +119,10 @@ export default function Header() {
               <NavLink to="/progress">
                 Progress
               </NavLink>
+
+              <NavLink to="/accessibility">
+                Accessibility
+              </NavLink>
             </>
           )}
         </nav>
@@ -87,9 +138,33 @@ export default function Header() {
                   {user.full_name}
                 </span>
 
-                <span className="header-user-role">
-                  {user.role}
-                </span>
+                <div className="header-user-meta">
+                  <span className="header-user-role">
+                    {user.role}
+                  </span>
+
+                  {user.isl_enabled && (
+                    <span
+                      className="accessibility-profile-icon"
+                      aria-label="Indian Sign Language support enabled"
+                    >
+                      ISL
+                    </span>
+                  )}
+
+                  {accessibilityLabel && (
+                    <span
+                      className="accessibility-profile-badge"
+                      aria-label={
+                        accessibilityLabel.ariaLabel
+                      }
+                    >
+                      {
+                        accessibilityLabel.shortLabel
+                      }
+                    </span>
+                  )}
+                </div>
               </div>
 
               <button

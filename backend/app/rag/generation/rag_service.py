@@ -90,18 +90,41 @@ class RAGService:
         # -------------------------------------------------
 
         contexts = [
-            item["text"]
+            item["text"].strip()
             for item in relevant
             if item.get("text")
+            and item["text"].strip()
         ]
 
+        # Retrieval results may theoretically contain
+        # metadata without usable text. Fail safely if so.
+        if not contexts:
+            return RAGResponse(
+                question=question,
+                answer=INSUFFICIENT_CONTEXT_MESSAGE,
+                sources=[],
+            )
+
+        # Combine retrieved chunks into the single context
+        # string expected by build_grounded_prompt().
+        #
+        # Source labels correspond to the retrieved chunks
+        # supplied to the model and support grounded citation.
+        context = "\n\n".join(
+            f"[Source {index}]\n{text}"
+            for index, text in enumerate(
+                contexts,
+                start=1,
+            )
+        )
+
         # -------------------------------------------------
-        # 5. Build controlled prompt
+        # 5. Build controlled grounded prompt
         # -------------------------------------------------
 
         prompt = build_grounded_prompt(
             question=question,
-            contexts=contexts,
+            context=context,
         )
 
         # -------------------------------------------------

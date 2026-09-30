@@ -9,6 +9,9 @@ import ProtectedRoute from
 import AppShell from
   "../components/layout/AppShell";
 
+import AccessibilityPreferencesPage from
+  "../pages/AccessibilityPreferencesPage";
+
 import DashboardPage from
   "../pages/DashboardPage";
 
@@ -79,6 +82,13 @@ export default function App() {
           <Route
             path="/reviews"
             element={<ReviewsPage />}
+          />
+
+          <Route
+            path="/accessibility"
+            element={
+              <AccessibilityPreferencesPage />
+            }
           />
         </Route>
 

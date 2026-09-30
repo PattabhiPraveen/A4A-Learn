@@ -1,8 +1,7 @@
-import {
-  apiRequest,
-} from "./apiClient";
+import { apiRequest } from "./apiClient";
 
 import type {
+  AccessibilityProfileUpdate,
   AuthUser,
   LoginRequest,
   LoginResponse,
@@ -28,6 +27,20 @@ export async function getCurrentUser(
     {
       method: "GET",
       token,
+    },
+  );
+}
+
+export async function updateAccessibilityProfile(
+  request: AccessibilityProfileUpdate,
+  token: string,
+): Promise<AuthUser> {
+  return apiRequest<AuthUser>(
+    "/users/me/accessibility",
+    {
+      method: "PATCH",
+      token,
+      body: JSON.stringify(request),
     },
   );
 }

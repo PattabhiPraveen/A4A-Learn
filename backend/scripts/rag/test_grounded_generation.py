@@ -57,8 +57,8 @@ def main():
     print_result(
         title="TEST 1 - GROUNDED QUESTION",
         question=(
-            "How can deaf students "
-            "learn Indian Sign Language?"
+            "Explain a Python for"
+            " loop with a simple example."
         ),
         service=service,
     )

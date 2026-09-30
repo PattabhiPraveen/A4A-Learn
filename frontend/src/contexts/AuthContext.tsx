@@ -18,9 +18,11 @@ import {
 import {
   getCurrentUser,
   login as loginRequest,
+  updateAccessibilityProfile as updateAccessibilityProfileRequest,
 } from "../services/authService";
 
 import type {
+  AccessibilityProfileUpdate,
   AuthUser,
 } from "../types/auth";
 
@@ -29,16 +31,17 @@ const TOKEN_STORAGE_KEY =
 
 interface AuthContextValue {
   user: AuthUser | null;
-
   token: string | null;
-
   isAuthenticated: boolean;
-
   isLoading: boolean;
 
   login: (
     email: string,
     password: string,
+  ) => Promise<AuthUser>;
+
+  updateAccessibilityProfile: (
+    request: AccessibilityProfileUpdate,
   ) => Promise<AuthUser>;
 
   logout: () => void;
@@ -150,7 +153,7 @@ export function AuthProvider({
     async (
       email: string,
       password: string,
-    ) => {
+    ): Promise<AuthUser> => {
       const loginResult =
         await loginRequest({
           email,
@@ -190,24 +193,62 @@ export function AuthProvider({
     [],
   );
 
-  const value = useMemo(
-    () => ({
-      user,
-      token,
-      isAuthenticated:
-        Boolean(token && user),
-      isLoading,
-      login,
-      logout,
-    }),
-    [
-      user,
-      token,
-      isLoading,
-      login,
-      logout,
-    ],
-  );
+  const updateAccessibilityProfile =
+    useCallback(
+      async (
+        request: AccessibilityProfileUpdate,
+      ): Promise<AuthUser> => {
+        if (!token) {
+          throw new Error(
+            "You must be signed in to update accessibility preferences.",
+          );
+        }
+
+        const updatedUser =
+          await updateAccessibilityProfileRequest(
+            request,
+            token,
+          );
+
+        if (!updatedUser.is_active) {
+          logout();
+
+          throw new Error(
+            "This account is inactive.",
+          );
+        }
+
+        setUser(updatedUser);
+
+        return updatedUser;
+      },
+      [
+        token,
+        logout,
+      ],
+    );
+
+  const value =
+    useMemo(
+      () => ({
+        user,
+        token,
+        isAuthenticated:
+          Boolean(token && user),
+        isLoading,
+        login,
+        updateAccessibilityProfile,
+        logout,
+      }),
+      [
+        user,
+        token,
+        isLoading,
+        login,
+        updateAccessibilityProfile,
+        logout,
+      ],
+    );
 
   return (
     <AuthContext.Provider

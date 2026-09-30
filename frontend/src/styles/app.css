@@ -1292,3 +1292,478 @@ body {
     transform: none;
   }
 }
+/* =========================================================
+   LEARNING CURRICULUM ENHANCEMENTS
+   Sprint 5.4C
+   ========================================================= */
+
+.lesson-course {
+  margin-top: 1rem;
+}
+
+.lesson-course:first-of-type {
+  margin-top: 0.5rem;
+}
+
+.lesson-course h3 {
+  margin: 0 0 0.75rem;
+
+  color:
+    var(--color-text);
+
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.lesson-course-list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.75rem;
+}
+
+.lesson-button {
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.lesson-button:focus-visible {
+  outline:
+    3px solid var(--color-primary);
+
+  outline-offset: 3px;
+}
+
+.lesson-button__id {
+  margin-top: 0 !important;
+  margin-bottom: 0.35rem;
+
+  color:
+    var(--color-primary) !important;
+
+  font-size: 0.8rem !important;
+  font-weight: 700;
+
+  letter-spacing: 0.04em;
+}
+
+.lesson-button__meta {
+  margin-top: 0.4rem !important;
+
+  color:
+    var(--color-text-muted) !important;
+
+  font-size: 0.85rem !important;
+}
+
+.lesson-header {
+  padding-bottom: 1.5rem;
+
+  border-bottom:
+    1px solid var(--color-border);
+}
+
+.lesson-curriculum-id {
+  display: inline-block;
+
+  margin: 0.25rem 0 0;
+
+  color:
+    var(--color-primary);
+
+  font-size: 0.875rem;
+  font-weight: 700;
+
+  letter-spacing: 0.04em;
+}
+
+.lesson-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+
+  gap: 0.5rem;
+
+  margin-top: 0.75rem;
+
+  color:
+    var(--color-text-muted);
+
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.lesson-section {
+  margin-top: 1.75rem;
+}
+
+.lesson-section:first-child {
+  margin-top: 0;
+}
+
+.lesson-section h3 {
+  margin-bottom: 0.75rem;
+
+  font-size: 1.25rem;
+  line-height: 1.35;
+}
+
+.lesson-section h4 {
+  margin-bottom: 0.75rem;
+
+  font-size: 1.1rem;
+  line-height: 1.4;
+}
+
+.lesson-body {
+  overflow-wrap: anywhere;
+}
+
+.lesson-body p {
+  white-space: pre-wrap;
+}
+
+.lesson-body code {
+  padding: 0.15rem 0.35rem;
+
+  border:
+    1px solid var(--color-border);
+
+  border-radius: 0.3rem;
+
+  font-family:
+    "Courier New",
+    Courier,
+    monospace;
+
+  font-size: 0.95em;
+}
+
+.lesson-body pre {
+  overflow-x: auto;
+
+  padding: 1rem;
+
+  border:
+    1px solid var(--color-border);
+
+  border-radius:
+    var(--radius-small);
+
+  line-height: 1.6;
+}
+
+.lesson-body pre code {
+  padding: 0;
+
+  border: 0;
+}
+
+.lesson-help {
+  margin-top: 2rem;
+
+  padding: 1.25rem;
+
+  border:
+    1px solid var(--color-border);
+
+  border-radius:
+    var(--radius-small);
+
+  background:
+    var(--color-primary-light);
+}
+
+.lesson-help h3 {
+  margin: 0 0 0.5rem;
+
+  font-size: 1.1rem;
+}
+
+.lesson-help p {
+  margin: 0 0 1rem;
+
+  line-height: 1.65;
+}
+
+.lesson-actions {
+  margin-top: 1.5rem;
+}
+
+
+/* ---------------------------------------------------------
+   Learning page mobile refinement
+   --------------------------------------------------------- */
+
+@media (max-width: 520px) {
+  .lesson-button {
+    padding: 0.9rem;
+  }
+
+  .lesson-meta {
+    align-items: flex-start;
+  }
+
+  .lesson-help {
+    padding: 1rem;
+  }
+
+  .lesson-help .button {
+    width: 100%;
+  }
+}
+
+
+/* ---------------------------------------------------------
+   Learning page reduced-motion refinement
+   --------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .lesson-button {
+    transition: none;
+  }
+}
+
+/* =========================================================
+   Accessibility-aware authenticated user header
+   Sprint 5.4A
+   ========================================================= */
+
+.header-user {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+
+  gap: 0.3rem;
+  min-width: 0;
+
+  line-height: 1.2;
+}
+
+.header-user-name {
+  display: block;
+
+  color: var(--color-text);
+
+  font-weight: 700;
+  line-height: 1.2;
+
+  white-space: nowrap;
+}
+
+.header-user-meta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+
+  gap: 0.5rem;
+}
+
+.header-user-role {
+  display: inline-flex;
+  align-items: center;
+
+  margin-top: 0;
+
+  color: var(--color-text-muted);
+
+  font-size: 0.8rem;
+  line-height: 1.2;
+
+  text-transform: capitalize;
+}
+
+.accessibility-profile-badge {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 0.4rem;
+
+  padding: 0.25rem 0.55rem;
+
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+
+  background: var(--color-surface);
+
+  color: var(--color-text);
+
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+
+  white-space: nowrap;
+}
+
+.accessibility-profile-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding-right: 0.4rem;
+
+  border-right: 1px solid var(--color-border);
+
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 960px) {
+  .header-user {
+    align-items: flex-start;
+  }
+
+  .header-user-meta {
+    justify-content: flex-start;
+  }
+}
+
+/* =========================================================
+   Accessibility preferences
+   Sprint 5.4A
+   ========================================================= */
+
+.accessibility-page {
+  max-width: 56rem;
+  margin: 0 auto;
+}
+
+.accessibility-page-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+
+  margin-bottom: 2rem;
+}
+
+.accessibility-form {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.accessibility-fieldset {
+  display: grid;
+  gap: 1rem;
+
+  margin: 0;
+  padding: 1.25rem;
+
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+
+  background: var(--color-surface);
+}
+
+.accessibility-fieldset legend {
+  padding: 0 0.4rem;
+
+  font-weight: 700;
+}
+
+.form-help-text {
+  margin: 0;
+
+  color: var(--color-text-muted);
+
+  font-size: 0.9rem;
+}
+
+.accessibility-profile-options {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 0.75rem;
+}
+
+.accessibility-option {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 0.75rem;
+
+  padding: 1rem;
+
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+
+  cursor: pointer;
+}
+
+.accessibility-option--selected {
+  border-width: 2px;
+}
+
+.accessibility-option input {
+  margin-top: 0.25rem;
+}
+
+.accessibility-option-content {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.accessibility-option-content > span {
+  color: var(--color-text-muted);
+
+  font-size: 0.9rem;
+}
+
+.accessibility-toggle {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 0.75rem;
+
+  cursor: pointer;
+}
+
+.accessibility-toggle input {
+  margin-top: 0.3rem;
+}
+
+.accessibility-toggle > span {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.accessibility-toggle > span > span {
+  color: var(--color-text-muted);
+
+  font-size: 0.9rem;
+}
+
+.accessibility-form-actions {
+  display: flex;
+  align-items: center;
+
+  gap: 0.75rem;
+}
+
+.form-message {
+  padding: 0.85rem 1rem;
+
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+}
+
+@media (max-width: 720px) {
+  .accessibility-page-heading {
+    flex-direction: column;
+  }
+
+  .accessibility-profile-options {
+    grid-template-columns: 1fr;
+  }
+
+  .accessibility-form-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

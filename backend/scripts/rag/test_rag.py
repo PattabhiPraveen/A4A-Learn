@@ -2,7 +2,6 @@ import sys
 from pathlib import Path
 
 
-# Make backend available for imports
 BACKEND_ROOT = Path(__file__).resolve().parents[2]
 
 if str(BACKEND_ROOT) not in sys.path:
@@ -55,7 +54,7 @@ def run_test(question: str) -> None:
 def main() -> None:
 
     question = (
-        "How should a beginner learn Indian Sign Language?"
+        "Explain a Python for loop with a simple example."
     )
 
     run_test(question)

@@ -15,38 +15,47 @@ from app.rag.generation.rag_service import (
 
 
 TEST_CASES = [
+    # ---------------------------------------------------------
+    # Governed Python curriculum
+    # ---------------------------------------------------------
     {
         "id": "Q01",
-        "question": "What is Indian Sign Language?",
+        "question": "What is Python and where is it used?",
         "expected": "accept",
         "expected_source": "lesson_01",
     },
     {
         "id": "Q02",
-        "question": "How should a learner begin learning Indian Sign Language?",
+        "question": "What is a variable in Python?",
         "expected": "accept",
         "expected_source": "lesson_02",
     },
     {
         "id": "Q03",
-        "question": "Why is visual observation important when learning signs?",
-        "expected": "accept",
-        "expected_source": "lesson_02",
-    },
-    {
-        "id": "Q04",
-        "question": "How does sign language communicate information?",
-        "expected": "accept",
-        "expected_source": "lesson_01",
-    },
-    {
-        "id": "Q05",
-        "question": "What can make digital learning accessible for deaf learners?",
+        "question": "How does a Python for loop work?",
         "expected": "accept",
         "expected_source": "lesson_03",
     },
 
+    # ---------------------------------------------------------
+    # Governed AI curriculum
+    # ---------------------------------------------------------
+    {
+        "id": "Q04",
+        "question": "What is Artificial Intelligence?",
+        "expected": "accept",
+        "expected_source": "lesson_04",
+    },
+    {
+        "id": "Q05",
+        "question": "What is Retrieval-Augmented Generation and why is it useful?",
+        "expected": "accept",
+        "expected_source": "lesson_06",
+    },
+
+    # ---------------------------------------------------------
     # Out-of-domain questions
+    # ---------------------------------------------------------
     {
         "id": "Q06",
         "question": "Explain the architecture of a nuclear reactor.",
@@ -80,16 +89,12 @@ TEST_CASES = [
 ]
 
 
-def source_matches(
-    sources,
-    expected_source,
-):
+def source_matches(sources, expected_source):
     if expected_source is None:
         return len(sources) == 0
 
     return any(
-        expected_source.lower()
-        in source.source.lower()
+        expected_source.lower() in source.source.lower()
         for source in sources
     )
 
@@ -110,9 +115,7 @@ def main():
 
     for test in TEST_CASES:
 
-        result = service.ask(
-            test["question"]
-        )
+        result = service.ask(test["question"])
 
         refused = (
             result.answer

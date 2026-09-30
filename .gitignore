@@ -16,3 +16,11 @@ frontend/dist/
 
 # Temporary and backup files
 *.bak
+
+# SearXNG local runtime configuration
+# Contains locally generated secret material.
+backend/infra/searxng/settings.yml
+
+# Local rollback backups
+backups/
+A4A-Learn-Backups/

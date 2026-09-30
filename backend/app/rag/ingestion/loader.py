@@ -1,7 +1,7 @@
-import json
-from pathlib import Path
-# from uuid import uuid4
 import hashlib
+import json
+import re
+from pathlib import Path
 
 import pandas as pd
 from docx import Document as DocxDocument
@@ -23,9 +23,75 @@ SUPPORTED_EXTENSIONS = {
 
 def load_text_file(path: Path) -> str:
     return path.read_text(
-        encoding="utf-8",
+        encoding="utf-8-sig",
         errors="ignore",
     )
+
+
+def parse_markdown_front_matter(
+    content: str,
+) -> tuple[str, dict]:
+    """
+    Extract simple governed front matter from Markdown.
+
+    The metadata is returned separately and is not included
+    in the learner-facing text sent for chunking/embedding.
+
+    Markdown without front matter is returned unchanged.
+    """
+    if not content:
+        return "", {}
+
+    normalized = content.lstrip("\ufeff")
+
+    lines = normalized.splitlines()
+
+    if (
+        not lines
+        or lines[0].strip() != "---"
+    ):
+        return normalized, {}
+
+    closing_index = None
+
+    for index in range(1, len(lines)):
+        if lines[index].strip() == "---":
+            closing_index = index
+            break
+
+    if closing_index is None:
+        # Do not silently discard content when front matter
+        # is malformed. Leave it unchanged for generic RAG
+        # ingestion behavior.
+        return normalized, {}
+
+    metadata = {}
+
+    for line in lines[1:closing_index]:
+        stripped = line.strip()
+
+        if not stripped:
+            continue
+
+        if ":" not in stripped:
+            continue
+
+        key, value = stripped.split(
+            ":",
+            1,
+        )
+
+        key = key.strip()
+        value = value.strip()
+
+        if key and value:
+            metadata[key] = value
+
+    body = "\n".join(
+        lines[closing_index + 1 :]
+    ).strip()
+
+    return body, metadata
 
 
 def load_pdf(path: Path) -> str:
@@ -76,16 +142,23 @@ def load_json(path: Path) -> str:
     )
 
 
-def generate_document_id(path: Path) -> str:
+def generate_document_id(
+    path: Path,
+) -> str:
     """
     Generate a stable document ID from the source path.
-    The same document receives the same ID on every indexing run.
+
+    The same document receives the same ID on every
+    indexing run.
     """
-    normalized_path = str(path.resolve()).lower()
+    normalized_path = str(
+        path.resolve()
+    ).lower()
 
     return hashlib.sha256(
         normalized_path.encode("utf-8")
     ).hexdigest()[:24]
+
 
 def load_xlsx(path: Path) -> str:
     workbook = pd.ExcelFile(path)
@@ -93,7 +166,6 @@ def load_xlsx(path: Path) -> str:
     sections = []
 
     for sheet_name in workbook.sheet_names:
-
         dataframe = pd.read_excel(
             path,
             sheet_name=sheet_name,
@@ -107,12 +179,23 @@ def load_xlsx(path: Path) -> str:
     return "\n\n".join(sections)
 
 
-def load_document(path: Path) -> Document:
-
+def load_document(
+    path: Path,
+) -> Document:
     extension = path.suffix.lower()
+
+    extracted_metadata = {}
 
     if extension in {".txt", ".md"}:
         content = load_text_file(path)
+
+        if extension == ".md":
+            (
+                content,
+                extracted_metadata,
+            ) = parse_markdown_front_matter(
+                content
+            )
 
     elif extension == ".pdf":
         content = load_pdf(path)
@@ -131,16 +214,20 @@ def load_document(path: Path) -> Document:
 
     else:
         raise ValueError(
-            f"Unsupported document type: {extension}"
+            f"Unsupported document type: "
+            f"{extension}"
         )
 
     return Document(
-        document_id=generate_document_id(path),
+        document_id=generate_document_id(
+            path
+        ),
         source=str(path),
         title=path.stem,
         content=content.strip(),
         metadata={
             "filename": path.name,
             "extension": extension,
+            **extracted_metadata,
         },
     )

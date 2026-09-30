@@ -29,6 +29,14 @@ def register(
     user_data: UserCreate,
     db: Session = Depends(get_db),
 ):
+    """
+    Register a new learner account.
+
+    Security boundary:
+    - Public registration creates a student account only.
+    - Role is assigned by the backend service.
+    - Accessibility preferences are not inferred during registration.
+    """
 
     existing_user = get_user_by_email(
         db,
@@ -53,6 +61,10 @@ def register(
         full_name=user.full_name,
         email=user.email,
         role=user.role,
+        accessibility_profile=user.accessibility_profile,
+        preferred_language=user.preferred_language,
+        isl_enabled=user.isl_enabled,
+        captions_enabled=user.captions_enabled,
         is_active=user.is_active,
     )
 
@@ -65,6 +77,13 @@ def login(
     login_data: LoginRequest,
     db: Session = Depends(get_db),
 ):
+    """
+    Authenticate an existing user and issue a JWT access token.
+
+    Authorization information remains role-based.
+    Accessibility preferences are retrieved separately through /users/me
+    and are not used for authorization.
+    """
 
     user = get_user_by_email(
         db,
