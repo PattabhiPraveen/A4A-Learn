@@ -18,8 +18,13 @@ import {
 
 import {
   getLearningLesson,
+  getLearningLessonISL,
   getLearningLessons,
 } from "../services/learningService";
+
+import type {
+  ISLLessonManifest,
+} from "../types/islContent";
 
 import type {
   LearningLessonDetail,
@@ -34,7 +39,10 @@ const COURSE_ORDER = [
 
 
 export default function LearnPage() {
-  const { token } = useAuth();
+  const {
+    token,
+    user,
+  } = useAuth();
 
   const [
     lessons,
@@ -56,6 +64,13 @@ export default function LearnPage() {
   >(null);
 
   const [
+    islManifest,
+    setIslManifest,
+  ] = useState<
+    ISLLessonManifest | null
+  >(null);
+
+  const [
     isLoadingLessons,
     setIsLoadingLessons,
   ] = useState(true);
@@ -66,8 +81,20 @@ export default function LearnPage() {
   ] = useState(false);
 
   const [
+    isLoadingISL,
+    setIsLoadingISL,
+  ] = useState(false);
+
+  const [
     errorMessage,
     setErrorMessage,
+  ] = useState<string | null>(
+    null,
+  );
+
+  const [
+    islErrorMessage,
+    setIslErrorMessage,
   ] = useState<string | null>(
     null,
   );
@@ -191,6 +218,76 @@ export default function LearnPage() {
   ]);
 
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadISLContent() {
+      setIslManifest(null);
+      setIslErrorMessage(null);
+
+      if (
+        !token ||
+        !selectedLessonId ||
+        !user?.isl_enabled
+      ) {
+        setIsLoadingISL(false);
+        return;
+      }
+
+      setIsLoadingISL(true);
+
+      try {
+        const result =
+          await getLearningLessonISL(
+            selectedLessonId,
+            token,
+          );
+
+        if (!cancelled) {
+          setIslManifest(result);
+        }
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
+        /*
+         * ISL content is an additional accessible
+         * teaching modality. Failure to retrieve an
+         * ISL manifest must never remove the approved
+         * written and visual lesson.
+         */
+        if (
+          error instanceof ApiError &&
+          error.status === 404
+        ) {
+          setIslErrorMessage(
+            "Validated ISL learning content is not yet registered for this lesson. The written and visual lesson remains available.",
+          );
+        } else {
+          setIslErrorMessage(
+            "ISL learning content could not be loaded. The written and visual lesson remains available.",
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingISL(false);
+        }
+      }
+    }
+
+    void loadISLContent();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    selectedLessonId,
+    token,
+    user?.isl_enabled,
+  ]);
+
+
   const groupedLessons =
     useMemo(() => {
       return COURSE_ORDER.map(
@@ -300,6 +397,127 @@ export default function LearnPage() {
           </p>
         );
       },
+    );
+  }
+
+
+  function renderISLStatus() {
+    if (!user?.isl_enabled) {
+      return null;
+    }
+
+    if (isLoadingISL) {
+      return (
+        <p
+          role="status"
+          aria-live="polite"
+        >
+          Loading ISL learning support...
+        </p>
+      );
+    }
+
+    if (islErrorMessage) {
+      return (
+        <div
+          className="status-message"
+          role="status"
+        >
+          <p>
+            {islErrorMessage}
+          </p>
+
+          <Link
+            to="/isl"
+            className="button button--secondary"
+          >
+            Open ISL Practice
+          </Link>
+        </div>
+      );
+    }
+
+    if (!islManifest) {
+      return null;
+    }
+
+    return (
+      <>
+        <p>
+          {islManifest.message}
+        </p>
+
+        <p>
+          <strong>
+            Validated ISL segments:
+          </strong>{" "}
+          {islManifest.available_segments}
+          {" / "}
+          {islManifest.total_segments}
+        </p>
+
+        {islManifest.segments.some(
+          (segment) =>
+            segment.status ===
+            "available",
+        ) && (
+          <div
+            className="isl-segment-list"
+            aria-label="Available ISL lesson segments"
+          >
+            {islManifest.segments
+              .filter(
+                (segment) =>
+                  segment.status ===
+                  "available",
+              )
+              .map(
+                (segment) => (
+                  <section
+                    key={
+                      segment.segment_id
+                    }
+                    className="isl-segment"
+                  >
+                    <h4>
+                      {segment.heading}
+                    </h4>
+
+                    {segment.caption && (
+                      <p>
+                        {segment.caption}
+                      </p>
+                    )}
+
+                    <p>
+                      Validated ISL learning
+                      asset available.
+                    </p>
+                  </section>
+                ),
+              )}
+          </div>
+        )}
+
+        {islManifest.status ===
+          "pending_review" && (
+          <p>
+            ISL teaching assets are shown
+            only after validation. A4A Learn
+            does not generate or invent ISL
+            signs for unavailable segments.
+          </p>
+        )}
+
+        <div className="lesson-actions">
+          <Link
+            to="/isl"
+            className="button button--secondary"
+          >
+            Open ISL Practice
+          </Link>
+        </div>
+      </>
     );
   }
 
@@ -508,6 +726,33 @@ export default function LearnPage() {
                   selectedLesson.content,
                 )}
               </div>
+
+              {user?.isl_enabled && (
+                <aside
+                  className="lesson-help"
+                  aria-labelledby="isl-learning-heading"
+                >
+                  <p className="eyebrow">
+                    Accessible learning
+                  </p>
+
+                  <h3
+                    id="isl-learning-heading"
+                  >
+                    ISL Learning
+                  </h3>
+
+                  <p>
+                    Learn this topic with
+                    governed Indian Sign
+                    Language support when
+                    validated teaching assets
+                    are available.
+                  </p>
+
+                  {renderISLStatus()}
+                </aside>
+              )}
 
               <aside
                 className="lesson-help"

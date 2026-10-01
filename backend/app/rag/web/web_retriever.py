@@ -1,4 +1,4 @@
-import re
+﻿import re
 
 import httpx
 
@@ -106,7 +106,6 @@ class WebRetriever:
     }
 
     _PYTHON_CONTROL_FLOW_TERMS = {
-        "for",
         "loop",
         "loops",
         "while",

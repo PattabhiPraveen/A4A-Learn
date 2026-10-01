@@ -185,6 +185,7 @@ export default function TutorPage() {
         await askTutor(
           normalizedQuestion,
           token,
+          lessonContext?.id,
         );
 
       setResult(response);

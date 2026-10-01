@@ -10,6 +10,11 @@ class RAGQuestion(BaseModel):
         max_length=1000,
     )
 
+    lesson_id: str | None = Field(
+        default=None,
+        max_length=64,
+    )
+
 
 class RAGSource(BaseModel):
     """

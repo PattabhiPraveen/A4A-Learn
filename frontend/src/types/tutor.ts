@@ -1,10 +1,18 @@
 export interface RAGQuestion {
   question: string;
+
+  // Optional governed lesson context.
+  // This identifier is sent only after the
+  // frontend has successfully validated the
+  // lesson through the learning API.
+  lesson_id?: string;
 }
+
 
 export type RAGSourceType =
   | "curriculum"
   | "web";
+
 
 export interface RAGSource {
   title: string;
@@ -18,6 +26,7 @@ export interface RAGSource {
   // Identifies the provenance of the evidence.
   source_type: RAGSourceType;
 }
+
 
 export interface RAGResponse {
   question: string;

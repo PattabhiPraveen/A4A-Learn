@@ -1767,3 +1767,37 @@ body {
     flex-direction: column;
   }
 }
+
+/* Sprint 5.6 - ISL alphabet practice */
+
+.isl-letter-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fit, minmax(3rem, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.isl-letter-grid .button {
+  min-height: 3rem;
+  min-width: 3rem;
+}
+
+.isl-image-preview {
+  margin-block: 1rem;
+}
+
+.isl-image-preview img {
+  display: block;
+  max-width: min(100%, 28rem);
+  max-height: 28rem;
+  object-fit: contain;
+  border-radius: 0.5rem;
+}
+
+@media (max-width: 40rem) {
+  .isl-letter-grid {
+    grid-template-columns:
+      repeat(5, minmax(0, 1fr));
+  }
+}

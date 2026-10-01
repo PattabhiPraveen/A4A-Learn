@@ -3,6 +3,10 @@ import {
 } from "./apiClient";
 
 import type {
+  ISLLessonManifest,
+} from "../types/islContent";
+
+import type {
   LearningLessonDetail,
   LearningLessonSummary,
 } from "../types/learning";
@@ -33,6 +37,24 @@ export async function getLearningLesson(
     `/learning/lessons/${encodeURIComponent(
       lessonId,
     )}`,
+    {
+      method: "GET",
+      token,
+    },
+  );
+}
+
+
+export async function getLearningLessonISL(
+  lessonId: string,
+  token: string,
+): Promise<ISLLessonManifest> {
+  return apiRequest<
+    ISLLessonManifest
+  >(
+    `/learning/lessons/${encodeURIComponent(
+      lessonId,
+    )}/isl`,
     {
       method: "GET",
       token,

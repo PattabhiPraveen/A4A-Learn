@@ -8,6 +8,7 @@ from app.api.routes.rag import router as rag_router
 from app.api.routes.isl import router as isl_router
 from app.api.routes.progress import router as progress_router
 from app.api.routes.reviews import router as reviews_router
+from app.api.routes.assessments import router as assessments_router
 from app.api.routes.learning import router as learning_router
 
 
@@ -21,4 +22,5 @@ api_router.include_router(rag_router)
 api_router.include_router(isl_router)
 api_router.include_router(progress_router)
 api_router.include_router(reviews_router)
+api_router.include_router(assessments_router)
 api_router.include_router(learning_router)

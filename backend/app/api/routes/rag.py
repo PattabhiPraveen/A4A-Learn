@@ -15,6 +15,9 @@ from app.schemas.rag import (
     RAGQuestion,
     RAGResponse,
 )
+from app.services.learning_content_service import (
+    LearningContentNotFoundError,
+)
 from app.services.learning_review_service import (
     LearningReviewService,
 )
@@ -66,6 +69,13 @@ def ask_question(
     """
     Answer a learner question using curriculum-grounded RAG.
 
+    An optional lesson_id allows the learner's explicitly selected
+    governed lesson to be considered first by the RAG service.
+
+    The client supplies only the lesson identifier. Trusted lesson
+    content is resolved server-side by the governed learning-content
+    service.
+
     Runtime governance:
 
     - grounded result:
@@ -77,12 +87,41 @@ def ask_question(
         and create/reuse a teacher review
 
     The route does not invent a numeric RAG confidence.
+
+    Backward compatibility:
+
+    - requests without lesson_id use the original
+      rag_service.answer(question) invocation
+
+    - requests with lesson_id use the new lesson-aware
+      rag_service.answer(question, lesson_id=...) invocation
     """
 
     try:
-        rag_result = rag_service.answer(
-            request.question
-        )
+        # -----------------------------------------
+        # 1. Execute RAG
+        # -----------------------------------------
+        #
+        # Preserve the original invocation contract
+        # when lesson_id is absent.
+        #
+        # This keeps existing clients, tests, and
+        # general Tutor behavior backward compatible.
+        # -----------------------------------------
+
+        if request.lesson_id is None:
+            rag_result = rag_service.answer(
+                request.question
+            )
+        else:
+            rag_result = rag_service.answer(
+                request.question,
+                lesson_id=request.lesson_id,
+            )
+
+        # -----------------------------------------
+        # 2. Initialize HITL governance
+        # -----------------------------------------
 
         review_service = LearningReviewService(
             db
@@ -97,19 +136,37 @@ def ask_question(
             [],
         )
 
-        # RAG evidence is represented by the existing
-        # grounded flag and retrieved sources.
+        # -----------------------------------------
+        # 3. Determine evidence sufficiency
+        # -----------------------------------------
         #
-        # No artificial numeric confidence is created.
+        # A result is considered sufficiently
+        # evidenced only when:
+        #
+        # - the RAG service reports it grounded
+        # - at least one evidence source exists
+        #
+        # No artificial numeric confidence is
+        # generated.
+        # -----------------------------------------
+
         sufficient_evidence = bool(
             grounded and sources
         )
+
+        # -----------------------------------------
+        # 4. Build privacy-conscious activity ID
+        # -----------------------------------------
 
         activity_reference_id = (
             _build_rag_activity_reference(
                 request.question
             )
         )
+
+        # -----------------------------------------
+        # 5. Build source summary for review
+        # -----------------------------------------
 
         retrieved_sources = (
             ", ".join(
@@ -124,6 +181,10 @@ def ask_question(
             if sources
             else None
         )
+
+        # -----------------------------------------
+        # 6. Evaluate HITL escalation
+        # -----------------------------------------
 
         workflow = (
             review_service.evaluate_and_escalate(
@@ -152,11 +213,19 @@ def ask_question(
             )
         )
 
+        # -----------------------------------------
+        # 7. Resolve optional review ID
+        # -----------------------------------------
+
         review_id = (
             workflow.review.id
             if workflow.review is not None
             else None
         )
+
+        # -----------------------------------------
+        # 8. Return governed Tutor response
+        # -----------------------------------------
 
         return RAGResponse(
             question=rag_result["question"],
@@ -175,11 +244,33 @@ def ask_question(
             review_id=review_id,
         )
 
+    # ---------------------------------------------
+    # Governed lesson does not exist
+    # ---------------------------------------------
+    #
+    # Do not expose an internal server error when
+    # the client supplies an unknown lesson ID.
+    # ---------------------------------------------
+
+    except LearningContentNotFoundError as exc:
+        raise HTTPException(
+            status_code=404,
+            detail=str(exc),
+        ) from exc
+
+    # ---------------------------------------------
+    # Invalid RAG request
+    # ---------------------------------------------
+
     except ValueError as exc:
         raise HTTPException(
             status_code=400,
             detail=str(exc),
         ) from exc
+
+    # ---------------------------------------------
+    # RAG runtime/service unavailable
+    # ---------------------------------------------
 
     except RuntimeError as exc:
         raise HTTPException(

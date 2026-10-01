@@ -11,9 +11,15 @@ import type {
 export async function askTutor(
   question: string,
   token: string,
+  lessonId?: string,
 ): Promise<RAGResponse> {
   const payload: RAGQuestion = {
     question,
+    ...(lessonId
+      ? {
+          lesson_id: lessonId,
+        }
+      : {}),
   };
 
   return apiRequest<RAGResponse>(

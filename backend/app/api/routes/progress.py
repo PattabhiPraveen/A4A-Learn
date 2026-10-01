@@ -10,13 +10,21 @@ from sqlalchemy.orm import Session
 from app.api.dependencies import get_current_user
 from app.database.database import get_db
 from app.models.user import User
+from app.schemas.lesson_progress import (
+    LessonProgressResponse,
+)
 from app.schemas.progress import (
     ISLAttemptCreate,
     ISLAttemptResponse,
     ProgressAnalyticsResponse,
     ProgressSummaryResponse,
 )
-from app.services.progress_service import ProgressService
+from app.services.lesson_progress_service import (
+    LessonProgressService,
+)
+from app.services.progress_service import (
+    ProgressService,
+)
 
 
 router = APIRouter(
@@ -129,3 +137,32 @@ def get_my_progress_analytics(
             ),
             detail=str(exc),
         ) from exc
+
+
+@router.get(
+    "/lessons/{lesson_id}",
+    response_model=LessonProgressResponse,
+)
+def get_lesson_progress(
+    lesson_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        get_current_user
+    ),
+):
+    """
+    Return assessment progress for a lesson
+    for the authenticated learner.
+
+    Security boundary:
+    - user_id is never accepted from the client
+    - current_user.id comes from the validated JWT
+    - progress is therefore scoped to the authenticated learner
+    """
+
+    service = LessonProgressService(db)
+
+    return service.get_lesson_progress(
+        user_id=current_user.id,
+        lesson_id=lesson_id,
+    )
