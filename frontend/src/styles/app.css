@@ -1801,3 +1801,86 @@ body {
       repeat(5, minmax(0, 1fr));
   }
 }
+/* =========================================================
+   PROGRESS PAGE
+   Sprint 5.7
+   ========================================================= */
+
+.metric-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    );
+
+  gap: 1rem;
+
+  margin-top: 2rem;
+}
+
+.metric-grid > .metric-card {
+  min-height: 7rem;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  gap: 0.75rem;
+
+  padding: 1.25rem;
+
+  border:
+    1px solid var(--color-border);
+
+  border-radius:
+    var(--radius-large);
+
+  background:
+    var(--color-surface);
+}
+
+.metric-grid > .metric-card > span {
+  display: block;
+
+  color:
+    var(--color-text-muted);
+
+  font-size: 0.9rem;
+
+  line-height: 1.4;
+}
+
+.metric-grid > .metric-card > strong {
+  display: block;
+
+  margin-top: auto;
+
+  font-size: 2rem;
+  font-weight: 800;
+
+  line-height: 1.1;
+}
+
+@media (max-width: 900px) {
+  .metric-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+}
+
+@media (max-width: 560px) {
+  .metric-grid {
+    grid-template-columns: 1fr;
+
+    gap: 0.75rem;
+  }
+
+  .metric-grid > .metric-card {
+    min-height: 6.5rem;
+  }
+}
