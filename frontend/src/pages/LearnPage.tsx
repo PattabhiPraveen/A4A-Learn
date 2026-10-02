@@ -350,7 +350,9 @@ export default function LearnPage() {
               key={index}
               className="lesson-section"
             >
-              <h3>{heading}</h3>
+              <h3>
+                {heading}
+              </h3>
 
               {remainingContent && (
                 <p>
@@ -380,7 +382,9 @@ export default function LearnPage() {
               key={index}
               className="lesson-section"
             >
-              <h4>{heading}</h4>
+              <h4>
+                {heading}
+              </h4>
 
               {remainingContent && (
                 <p>
@@ -783,6 +787,22 @@ export default function LearnPage() {
               </aside>
 
               <div className="lesson-actions">
+                <Link
+                  to={`/assessment/${encodeURIComponent(
+                    selectedLesson.id,
+                  )}`}
+                  className="button button--primary"
+                >
+                  Take Assessment
+                </Link>
+
+                <Link
+                  to="/progress"
+                  className="button button--secondary"
+                >
+                  View Progress
+                </Link>
+
                 <Link
                   to="/dashboard"
                   className="button button--secondary"

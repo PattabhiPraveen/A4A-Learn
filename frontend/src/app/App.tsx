@@ -12,6 +12,9 @@ import AppShell from
 import AccessibilityPreferencesPage from
   "../pages/AccessibilityPreferencesPage";
 
+import AssessmentPage from
+  "../pages/AssessmentPage";
+
 import DashboardPage from
   "../pages/DashboardPage";
 
@@ -39,10 +42,13 @@ import ReviewsPage from
 import TutorPage from
   "../pages/TutorPage";
 
+
 export default function App() {
   return (
     <Routes>
-      <Route element={<AppShell />}>
+      <Route
+        element={<AppShell />}
+      >
         <Route
           path="/"
           element={<HomePage />}
@@ -53,7 +59,9 @@ export default function App() {
           element={<LoginPage />}
         />
 
-        <Route element={<ProtectedRoute />}>
+        <Route
+          element={<ProtectedRoute />}
+        >
           <Route
             path="/dashboard"
             element={<DashboardPage />}
@@ -62,6 +70,11 @@ export default function App() {
           <Route
             path="/learn"
             element={<LearnPage />}
+          />
+
+          <Route
+            path="/assessment/:lessonId"
+            element={<AssessmentPage />}
           />
 
           <Route
