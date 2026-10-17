@@ -8,42 +8,60 @@ from app.rag.web.models import (
 
 class EvidenceSelector:
     """
-    Deterministically select a bounded, query-relevant
-    evidence window from a sanitized external document.
+    Select bounded, query-relevant evidence from a sanitized
+    external web document.
 
-    No LLM is used for evidence selection.
+    Security properties:
 
-    The output is TrustedWebEvidence and is therefore
-    bounded to the downstream 5,000-character evidence
-    limit before it can enter the AI context.
+    - Never returns the complete external document.
+    - Requires lexical relevance to the user question.
+    - Selects a bounded evidence window.
+    - Preserves source provenance.
+    - Fails closed when no relevant evidence is found.
     """
 
     MAX_EVIDENCE_CHARS = 5000
-    WINDOW_RADIUS = 2200
-
-    _TOKEN_PATTERN = re.compile(
-        r"[A-Za-z_][A-Za-z0-9_.]*"
-    )
+    WINDOW_RADIUS = 2500
 
     _STOP_WORDS = {
         "a",
         "an",
         "and",
         "are",
+        "as",
+        "at",
+        "be",
+        "by",
+        "can",
         "do",
         "does",
         "for",
+        "from",
         "how",
+        "i",
         "in",
         "is",
         "it",
+        "me",
         "of",
         "on",
+        "or",
+        "tell",
         "the",
+        "this",
         "to",
         "what",
+        "when",
+        "where",
+        "which",
+        "who",
+        "why",
         "with",
     }
+
+    _TERM_PATTERN = re.compile(
+        r"[A-Za-z0-9][A-Za-z0-9_.+-]*"
+    )
 
     @classmethod
     def _query_terms(
@@ -51,35 +69,36 @@ class EvidenceSelector:
         question: str,
     ) -> list[str]:
         """
-        Extract useful lexical terms from the question.
+        Extract meaningful lexical terms from the
+        user question.
 
-        Qualified identifiers are preserved and also
-        decomposed into components.
+        Punctuation is removed from the extracted
+        terms so that:
 
-        Example:
+            "Python."
 
-        pathlib.Path.read_text
+        correctly matches:
 
-        becomes useful terms including:
+            "Python"
 
-        pathlib.path.read_text
-        pathlib
-        path
-        read_text
+        Stop words are removed so that generic words
+        do not become relevance anchors.
         """
 
-        raw_terms = cls._TOKEN_PATTERN.findall(
+        terms = []
+
+        for match in cls._TERM_PATTERN.finditer(
             question
-        )
+        ):
+            term = match.group(0).strip()
 
-        terms: list[str] = []
+            if not term:
+                continue
 
-        for raw_term in raw_terms:
-            normalized = (
-                raw_term
-                .lower()
-                .strip(".")
-            )
+            # Normalize punctuation around the term.
+            normalized = term.strip(
+                ".,;:!?()[]{}\"'`"
+            ).lower()
 
             if not normalized:
                 continue
@@ -87,57 +106,49 @@ class EvidenceSelector:
             if normalized in cls._STOP_WORDS:
                 continue
 
-            if normalized not in terms:
-                terms.append(
-                    normalized
-                )
+            # Keep meaningful numeric tokens such as
+            # "3" and "5" because they can be critical
+            # to factual questions.
+            if (
+                len(normalized) < 2
+                and not normalized.isdigit()
+            ):
+                continue
 
-            # Also expose components of qualified
-            # identifiers.
-            #
-            # pathlib.Path.read_text
-            # ->
-            # pathlib
-            # path
-            # read_text
-            for component in normalized.split("."):
-                if not component:
-                    continue
+            terms.append(
+                normalized
+            )
 
-                if component in cls._STOP_WORDS:
-                    continue
-
-                if component not in terms:
-                    terms.append(
-                        component
-                    )
-
-        return terms
+        # Prefer specific/longer terms first.
+        return sorted(
+            set(terms),
+            key=lambda value: (
+                -len(value),
+                value,
+            ),
+        )
 
     @classmethod
-    def _find_best_position(
+    def _find_anchor(
         cls,
+        *,
         text: str,
         terms: list[str],
     ) -> int | None:
         """
-        Select a deterministic lexical anchor.
+        Find the earliest relevant lexical anchor in
+        the document.
 
-        Longer terms are checked first so that specific
-        identifiers such as read_text are preferred over
-        short generic terms such as path.
+        Longer/more-specific terms are evaluated first.
         """
 
-        lower_text = text.lower()
+        if not text:
+            return None
 
-        ranked_terms = sorted(
-            terms,
-            key=len,
-            reverse=True,
-        )
+        lowered = text.lower()
 
-        for term in ranked_terms:
-            position = lower_text.find(
+        for term in terms:
+            position = lowered.find(
                 term
             )
 
@@ -149,12 +160,13 @@ class EvidenceSelector:
     @classmethod
     def _bounded_window(
         cls,
+        *,
         text: str,
         anchor: int,
     ) -> str:
         """
-        Create a bounded evidence window around the
-        selected lexical anchor.
+        Return a bounded evidence window around the
+        relevance anchor.
         """
 
         if len(text) <= cls.MAX_EVIDENCE_CHARS:
@@ -170,80 +182,95 @@ class EvidenceSelector:
             start + cls.MAX_EVIDENCE_CHARS,
         )
 
-        # If the selected region reaches the end of the
-        # document, shift left where possible so that the
-        # available evidence budget remains useful.
-        start = max(
-            0,
-            end - cls.MAX_EVIDENCE_CHARS,
-        )
+        # If the anchor is close to the end of the
+        # document, shift the window backward so that
+        # the requested maximum size is preserved.
+        if (
+            end - start
+            < cls.MAX_EVIDENCE_CHARS
+        ):
+            start = max(
+                0,
+                end - cls.MAX_EVIDENCE_CHARS,
+            )
 
-        selected = text[
+        return text[
             start:end
         ].strip()
-
-        return selected
 
     @classmethod
     def select(
         cls,
+        *,
         question: str,
         document: FetchedWebDocument,
     ) -> TrustedWebEvidence:
         """
-        Convert a fetched sanitized document into
-        query-relevant bounded evidence.
+        Select bounded, query-relevant evidence.
 
-        The returned TrustedWebEvidence can safely move
-        to the downstream web context builder.
+        The selector fails closed when:
+
+        - the question is empty;
+        - the document content is empty;
+        - no meaningful query terms exist;
+        - no query term is found in the document.
         """
 
-        question = question.strip()
-
-        if not question:
+        if not question or not question.strip():
             raise ValueError(
                 "Question cannot be empty."
             )
 
-        text = document.content.strip()
+        if document is None:
+            raise ValueError(
+                "Document cannot be empty."
+            )
+
+        text = (
+            document.content
+            or ""
+        ).strip()
 
         if not text:
             raise ValueError(
-                "Fetched document content cannot be empty."
+                "Document content cannot be empty."
             )
 
         terms = cls._query_terms(
             question
         )
 
-        anchor = cls._find_best_position(
+        if not terms:
+            raise ValueError(
+                "No meaningful query terms found."
+            )
+
+        anchor = cls._find_anchor(
             text=text,
             terms=terms,
         )
 
+        # Fail closed when the retrieved document
+        # does not contain query-relevant evidence.
+        #
+        # Do NOT fall back to the first 5,000
+        # characters because that could inject
+        # unrelated web content into the grounded
+        # generation context.
         if anchor is None:
-            # No lexical anchor was found.
-            #
-            # Preserve deterministic fail-safe behavior
-            # by selecting only the bounded beginning of
-            # the document.
-            #
-            # This does not automatically make an answer
-            # grounded. The downstream generation and
-            # citation controls still apply.
-            selected = text[
-                : cls.MAX_EVIDENCE_CHARS
-            ].strip()
-
-        else:
-            selected = cls._bounded_window(
-                text=text,
-                anchor=anchor,
+            raise ValueError(
+                "No query-relevant external evidence "
+                "was found."
             )
+
+        selected = cls._bounded_window(
+            text=text,
+            anchor=anchor,
+        )
 
         if not selected:
             raise ValueError(
-                "No usable external evidence was selected."
+                "Selected evidence is empty."
             )
 
         return TrustedWebEvidence(

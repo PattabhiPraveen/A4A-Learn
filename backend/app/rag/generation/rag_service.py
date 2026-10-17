@@ -24,12 +24,20 @@ class RAGService:
           -> grounded prompt
           -> local LLM
           -> answer + sources
+
+    Retrieval calibration:
+        - ChromaDB distance is lower-is-better.
+        - The current embedding/retrieval evidence shows useful
+          Python-learning chunks in approximately the 1.19-1.39
+          distance range.
+        - Therefore the MVP baseline uses a wider threshold than
+          the previous 0.85 value.
     """
 
     def __init__(
         self,
-        top_k: int = 3,
-        max_distance: float = 0.85,
+        top_k: int = 5,
+        max_distance: float = 1.40,
     ):
         self.top_k = top_k
         self.max_distance = max_distance
@@ -65,6 +73,13 @@ class RAGService:
         #
         # ChromaDB distance:
         # lower distance = more relevant
+        #
+        # MVP calibration:
+        # useful Python-learning evidence was observed in
+        # approximately the 1.19-1.39 distance range.
+        #
+        # We therefore use 1.40 as the initial evidence
+        # acceptance boundary.
         # -------------------------------------------------
 
         relevant = [
@@ -105,11 +120,13 @@ class RAGService:
                 sources=[],
             )
 
-        # Combine retrieved chunks into the single context
-        # string expected by build_grounded_prompt().
+        # -------------------------------------------------
+        # 5. Combine retrieved chunks
         #
         # Source labels correspond to the retrieved chunks
         # supplied to the model and support grounded citation.
+        # -------------------------------------------------
+
         context = "\n\n".join(
             f"[Source {index}]\n{text}"
             for index, text in enumerate(
@@ -119,7 +136,7 @@ class RAGService:
         )
 
         # -------------------------------------------------
-        # 5. Build controlled grounded prompt
+        # 6. Build controlled grounded prompt
         # -------------------------------------------------
 
         prompt = build_grounded_prompt(
@@ -128,7 +145,7 @@ class RAGService:
         )
 
         # -------------------------------------------------
-        # 6. Generate locally using Ollama
+        # 7. Generate locally using Ollama
         # -------------------------------------------------
 
         answer = self.llm.generate(
@@ -139,7 +156,7 @@ class RAGService:
             answer = INSUFFICIENT_CONTEXT_MESSAGE
 
         # -------------------------------------------------
-        # 7. Preserve source evidence
+        # 8. Preserve source evidence
         # -------------------------------------------------
 
         sources = []
@@ -153,7 +170,7 @@ class RAGService:
 
             source = metadata.get(
                 "source",
-                "unknown"
+                "unknown",
             )
 
             sources.append(
@@ -164,6 +181,10 @@ class RAGService:
                     ),
                 )
             )
+
+        # -------------------------------------------------
+        # 9. Return grounded RAG response
+        # -------------------------------------------------
 
         return RAGResponse(
             question=question,

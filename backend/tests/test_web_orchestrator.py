@@ -66,6 +66,7 @@ class FakeRetriever:
             if results is not None
             else []
         )
+
         self.error = error
         self.questions = []
 
@@ -644,6 +645,82 @@ def test_zero_external_source_citation_is_ungrounded():
     assert result["grounded"] is False
     assert result["sources"] == []
 
+    assert (
+        result["answer"]
+        == WEB_FALLBACK_MESSAGE
+    )
+
+
+def test_external_source_citation_above_evidence_count_is_ungrounded():
+    candidate = make_evidence(
+        content="Python supports functions."
+    )
+
+    answer = (
+        "Python supports functions "
+        "[External Source 2]."
+    )
+
+    orchestrator = WebEvidenceOrchestrator(
+        retriever=FakeRetriever(
+            results=[
+                candidate,
+            ]
+        ),
+        fetcher=FakeFetcher(),
+        llm=FakeLLM(
+            answer
+        ),
+    )
+
+    result = orchestrator.answer(
+        "What does Python support?"
+    )
+
+    assert result["grounded"] is False
+    assert result["sources"] == []
+
+    assert (
+        result["answer"]
+        == WEB_FALLBACK_MESSAGE
+    )
+
+
+def test_mixed_valid_and_invalid_external_source_citations_are_ungrounded():
+    candidate = make_evidence(
+        content="Python supports functions."
+    )
+
+    answer = (
+        "Python supports functions "
+        "[External Source 1] "
+        "[External Source 2]."
+    )
+
+    orchestrator = WebEvidenceOrchestrator(
+        retriever=FakeRetriever(
+            results=[
+                candidate,
+            ]
+        ),
+        fetcher=FakeFetcher(),
+        llm=FakeLLM(
+            answer
+        ),
+    )
+
+    result = orchestrator.answer(
+        "What does Python support?"
+    )
+
+    assert result["grounded"] is False
+    assert result["sources"] == []
+
+    assert (
+        result["answer"]
+        == WEB_FALLBACK_MESSAGE
+    )
+
 
 def test_valid_multiple_external_source_citations_are_grounded():
     first = make_evidence(
@@ -874,3 +951,182 @@ def test_substantive_answer_with_valid_citation_remains_grounded():
     assert len(
         result["sources"]
     ) == 1
+def test_duplicate_web_sources_are_deduplicated_by_url():
+    first = make_evidence(
+        title="Python Tutorial",
+        url="https://docs.python.org/3/tutorial/",
+        content="Python supports functions.",
+    )
+
+    duplicate = make_evidence(
+        title="Python Tutorial Copy",
+        url="https://docs.python.org/3/tutorial/",
+        content="Python supports functions.",
+    )
+
+    answer = (
+        "Python supports functions "
+        "[External Source 1]."
+    )
+
+    orchestrator = WebEvidenceOrchestrator(
+        retriever=FakeRetriever(
+            results=[
+                first,
+                duplicate,
+            ]
+        ),
+        fetcher=FakeFetcher(),
+        llm=FakeLLM(answer),
+    )
+
+    result = orchestrator.answer(
+        "What is Python?"
+    )
+
+    assert result["grounded"] is True
+    assert len(result["sources"]) == 1
+    assert (
+        result["sources"][0]["source"]
+        == "https://docs.python.org/3/tutorial/"
+    )
+
+def test_duplicate_web_sources_are_deduplicated_by_content():
+    first = make_evidence(
+        title="Python Tutorial",
+        url="https://docs.python.org/3/tutorial/",
+        content="Python supports functions.",
+    )
+
+    duplicate = make_evidence(
+        title="Python Functions",
+        url="https://example.org/python-functions",
+        content="Python supports functions.",
+    )
+
+    answer = (
+        "Python supports functions "
+        "[External Source 1]."
+    )
+
+    orchestrator = WebEvidenceOrchestrator(
+        retriever=FakeRetriever(
+            results=[
+                first,
+                duplicate,
+            ]
+        ),
+        fetcher=FakeFetcher(),
+        llm=FakeLLM(answer),
+    )
+
+    result = orchestrator.answer(
+        "What is Python?"
+    )
+
+    assert result["grounded"] is True
+    assert len(result["sources"]) == 1
+
+def test_distinct_web_sources_are_preserved():
+    first = make_evidence(
+        title="Python Tutorial",
+        url="https://docs.python.org/3/tutorial/",
+        content="Python supports functions.",
+    )
+
+    second = make_evidence(
+        title="Python Language Reference",
+        url="https://docs.python.org/3/reference/",
+        content="Python uses indentation.",
+    )
+
+    answer = (
+        "Python supports functions "
+        "[External Source 1]. "
+        "Python also uses indentation "
+        "[External Source 2]."
+    )
+
+    orchestrator = WebEvidenceOrchestrator(
+        retriever=FakeRetriever(
+            results=[
+                first,
+                second,
+            ]
+        ),
+        fetcher=FakeFetcher(),
+        llm=FakeLLM(answer),
+    )
+
+    result = orchestrator.answer(
+        "Tell me about Python."
+    )
+
+    assert result["grounded"] is True
+    assert len(result["sources"]) == 2
+
+    assert (
+        result["sources"][0]["source"]
+        == "https://docs.python.org/3/tutorial/"
+    )
+
+    assert (
+        result["sources"][1]["source"]
+        == "https://docs.python.org/3/reference/"
+    )
+def test_citation_is_rejected_when_statement_is_not_supported_by_source():
+    candidate = make_evidence(
+        content=(
+            "Python uses indentation to define code blocks."
+        )
+    )
+
+    answer = (
+        "Python was created in 1991 "
+        "[External Source 1]."
+    )
+
+    orchestrator = WebEvidenceOrchestrator(
+        retriever=FakeRetriever(
+            results=[candidate],
+        ),
+        fetcher=FakeFetcher(),
+        llm=FakeLLM(answer),
+    )
+
+    result = orchestrator.answer(
+        "When was Python created?"
+    )
+
+    assert result["grounded"] is False
+    assert result["answer"] == WEB_FALLBACK_MESSAGE
+    assert result["sources"] == []
+
+
+def test_citation_is_accepted_when_statement_is_supported_by_source():
+    candidate = make_evidence(
+        content=(
+            "Python uses indentation to define code blocks."
+        )
+    )
+
+    answer = (
+        "Python uses indentation to define "
+        "code blocks [External Source 1]."
+    )
+
+    orchestrator = WebEvidenceOrchestrator(
+        retriever=FakeRetriever(
+            results=[candidate],
+        ),
+        fetcher=FakeFetcher(),
+        llm=FakeLLM(answer),
+    )
+
+    result = orchestrator.answer(
+        "How does Python define code blocks?"
+    )
+
+    assert result["grounded"] is True
+    assert result["answer"] == answer
+    assert len(result["sources"]) == 1

@@ -25,25 +25,54 @@ class OllamaClient:
         }
 
         try:
-            response = httpx.post(
-                f"{self.base_url}/api/generate",
-                json=payload,
-                timeout=120.0,
-            )
+            # Direct connection to Ollama.
+            # trust_env=False prevents HTTPX from using
+            # Windows proxy/environment variables.
+            with httpx.Client(
+                timeout=httpx.Timeout(
+                    connect=10.0,
+                    read=120.0,
+                    write=30.0,
+                    pool=10.0,
+                ),
+                trust_env=False,
+            ) as client:
 
-            response.raise_for_status()
+                response = client.post(
+                    f"{self.base_url}/api/generate",
+                    json=payload,
+                )
+
+                response.raise_for_status()
 
         except httpx.ConnectError as exc:
             raise RuntimeError(
-                "Unable to connect to local Ollama service."
+                f"Unable to connect to Ollama at {self.base_url}."
+            ) from exc
+
+        except httpx.TimeoutException as exc:
+            raise RuntimeError(
+                f"Ollama request timed out at {self.base_url}."
+            ) from exc
+
+        except httpx.HTTPStatusError as exc:
+            raise RuntimeError(
+                f"Ollama returned HTTP {exc.response.status_code}: "
+                f"{exc.response.text[:500]}"
             ) from exc
 
         except httpx.HTTPError as exc:
             raise RuntimeError(
-                f"Ollama generation failed: {exc}"
+                f"Ollama HTTP request failed: {exc}"
             ) from exc
 
-        data = response.json()
+        try:
+            data = response.json()
+
+        except ValueError as exc:
+            raise RuntimeError(
+                "Ollama returned invalid JSON."
+            ) from exc
 
         answer = data.get("response", "").strip()
 

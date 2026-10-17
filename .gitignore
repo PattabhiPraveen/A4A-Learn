@@ -24,3 +24,54 @@ backend/infra/searxng/settings.yml
 # Local rollback backups
 backups/
 A4A-Learn-Backups/
+
+# WSL / Python virtual environments
+.venv-wsl/
+.venv/
+.venv-*/
+
+# Runtime logs
+*.log
+
+# Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local diagnostic / temporary files
+*_backup*
+*.backup*
+*.bak
+backend/check_test_user.py
+backend/diagnose_auth.py
+backend/diagnose_login_http.py
+backend/inspect_test_user.py
+backend/measure_rf_latency.py
+backend/rag_smoke_test.py
+backend/selected_lesson_method.txt
+backend/test_bcrypt.py
+backend/test_rag_evaluation.py
+backend/=6.33.5,
+
+# Local Git backup
+.git_backup/
+
+# Local diagnostic / temporary files
+*_backup*
+*.backup*
+*.bak
+backend/check_test_user.py
+backend/diagnose_auth.py
+backend/diagnose_login_http.py
+backend/inspect_test_user.py
+backend/measure_rf_latency.py
+backend/rag_smoke_test.py
+backend/selected_lesson_method.txt
+backend/test_bcrypt.py
+backend/test_rag_evaluation.py
+backend/=6.33.5,
+
+# Local Git backup
+.git_backup/
