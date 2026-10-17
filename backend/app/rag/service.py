@@ -53,10 +53,19 @@ class RAGService:
     authorization, web-fallback eligibility, grounding controls,
     or human-in-the-loop behavior.
 
-    An explicitly selected lesson is tried first.
+    An explicitly selected lesson receives retrieval priority.
 
-    If that lesson cannot produce a grounded answer, the normal
-    curriculum RAG path continues unchanged.
+    Selection of a lesson does NOT automatically permit arbitrary
+    client-provided lesson content. The selected lesson is resolved
+    exclusively through LessonContextResolver, which provides
+    governed server-side curriculum evidence.
+
+    The resolved lesson evidence must satisfy the same
+    RAG_MAX_DISTANCE relevance threshold before it can be used
+    for grounded generation.
+
+    If the selected lesson cannot produce a grounded answer,
+    the normal curriculum RAG path continues.
 
     External web retrieval supplements the curriculum only when
     the local curriculum paths cannot produce a grounded answer.
@@ -181,22 +190,43 @@ class RAGService:
         """
         Try the explicitly selected governed lesson first.
 
-        The browser supplies only the lesson identifier.
+        IMPORTANT GOVERNANCE RULE:
 
-        LessonContextResolver resolves the identifier against
-        governed server-side curriculum content. Client-provided
-        lesson text is never accepted as trusted evidence.
+        lesson selection establishes evidence priority only.
+
+        The lesson content itself is never accepted directly from
+        the browser. The lesson identifier is resolved through the
+        server-side LessonContextResolver.
+
+        The resolver's returned retrieval result is then subjected
+        to the same RAG_MAX_DISTANCE threshold used by the normal
+        curriculum RAG path.
+
+        This design intentionally avoids sending the same question
+        through the general retriever before evaluating the selected
+        governed lesson. This ensures that an explicitly selected
+        lesson receives priority.
+
+        If the selected lesson cannot produce a grounded answer,
+        None is returned and the normal curriculum RAG path
+        continues.
 
         Returning None means either:
 
-        - no lesson was selected, or
-        - the selected lesson could not produce a grounded answer.
-
-        In either case, the normal curriculum RAG path continues.
+        - no lesson was selected,
+        - the selected lesson cannot be resolved,
+        - the selected lesson evidence is outside the allowed
+          relevance threshold, or
+        - the selected lesson cannot produce a grounded answer.
 
         Invalid or unknown lesson identifiers intentionally
         propagate to the API boundary rather than being silently
         treated as general Tutor requests.
+
+        The resolver is called even when lesson_id is None so that
+        the resolver remains the authoritative boundary for lesson
+        context resolution and the general RAG path remains
+        behaviorally consistent.
         """
 
         lesson_context = (
@@ -211,6 +241,66 @@ class RAGService:
         lesson_result = (
             lesson_context.as_retrieval_result()
         )
+
+        if not lesson_result:
+            return None
+
+        lesson_metadata = lesson_result.get(
+            "metadata",
+            {},
+        )
+
+        # -------------------------------------------------
+        # The LessonContextResolver is the trusted server-side
+        # source for explicitly selected lesson evidence.
+        #
+        # No lesson text supplied by the client is accepted.
+        # -------------------------------------------------
+
+        selected_lesson_title = (
+            lesson_metadata.get(
+                "title"
+            )
+        )
+
+        selected_lesson_source = (
+            lesson_metadata.get(
+                "source"
+            )
+        )
+
+        # -------------------------------------------------
+        # Apply the same relevance threshold used by the
+        # normal curriculum RAG path.
+        #
+        # The resolver-produced retrieval result contains
+        # the governed lesson distance.
+        # -------------------------------------------------
+
+        try:
+            selected_distance = float(
+                lesson_result["distance"]
+            )
+        except (
+            KeyError,
+            TypeError,
+            ValueError,
+        ):
+            return None
+
+        if (
+            selected_distance
+            > settings.RAG_MAX_DISTANCE
+        ):
+            return None
+
+        # -------------------------------------------------
+        # Build trusted context directly from the governed
+        # selected-lesson result.
+        #
+        # This is intentionally done before the general
+        # retriever is invoked.
+        # -------------------------------------------------
 
         context = build_context(
             [lesson_result]
@@ -232,15 +322,23 @@ class RAGService:
             prompt
         ).strip()
 
+        # -------------------------------------------------
+        # Generation-level grounding guardrail.
+        #
+        # Retrieval alone does not prove that the model
+        # successfully answered the question.
+        # -------------------------------------------------
+
         if (
             not answer
             or answer == FALLBACK_MESSAGE
         ):
             return None
 
-        metadata = lesson_result[
-            "metadata"
-        ]
+        metadata = lesson_result.get(
+            "metadata",
+            {},
+        )
 
         return {
             "question": question,
@@ -248,13 +346,19 @@ class RAGService:
             "grounded": True,
             "sources": [
                 {
-                    "title": metadata[
-                        "title"
-                    ],
-                    "source": metadata[
-                        "source"
-                    ],
-                    "distance": 0.0,
+                    "title": metadata.get(
+                        "title",
+                        selected_lesson_title
+                        or "Unknown source",
+                    ),
+                    "source": metadata.get(
+                        "source",
+                        selected_lesson_source,
+                    ),
+                    "distance": round(
+                        selected_distance,
+                        4,
+                    ),
                     "source_type": (
                         "curriculum"
                     ),
@@ -271,6 +375,18 @@ class RAGService:
         Answer a learner question through the governed
         A4A Learn RAG pipeline.
 
+        Processing order:
+
+        1. Validate question.
+        2. Attempt explicitly selected governed lesson.
+        3. If selected lesson cannot answer, use normal
+           curriculum retrieval.
+        4. Apply local relevance threshold.
+        5. Generate grounded curriculum answer.
+        6. If local curriculum cannot answer, use governed
+           web fallback when enabled.
+        7. Otherwise return safe abstention.
+
         Teaching intent controls presentation only.
         Evidence remains authoritative.
         """
@@ -283,7 +399,14 @@ class RAGService:
             )
 
         # -----------------------------------------
-        # 0. Try explicitly selected lesson first
+        # 0. Try explicitly selected lesson first.
+        #
+        # The lesson resolver is authoritative for the
+        # selected lesson. Its governed result is evaluated
+        # before the normal retriever is invoked.
+        #
+        # Selected lesson = evidence priority,
+        # NOT automatic grounding validity.
         # -----------------------------------------
 
         lesson_result = (
@@ -297,7 +420,14 @@ class RAGService:
             return lesson_result
 
         # -----------------------------------------
-        # 1. Retrieve local curriculum chunks
+        # 1. Retrieve local curriculum chunks.
+        #
+        # This is reached when:
+        #
+        # - no lesson was selected,
+        # - selected lesson could not be resolved,
+        # - selected lesson was not sufficiently relevant,
+        # - or selected lesson generation abstained.
         # -----------------------------------------
 
         results = self.retriever.retrieve(
@@ -305,7 +435,7 @@ class RAGService:
         )
 
         # -----------------------------------------
-        # 2. Apply local relevance threshold
+        # 2. Apply local relevance threshold.
         # -----------------------------------------
 
         relevant_results = [
@@ -316,7 +446,7 @@ class RAGService:
         ]
 
         # -----------------------------------------
-        # 3. No sufficient curriculum evidence
+        # 3. No sufficient curriculum evidence.
         # -----------------------------------------
 
         if not relevant_results:
@@ -325,7 +455,7 @@ class RAGService:
             )
 
         # -----------------------------------------
-        # 4. Build trusted curriculum context
+        # 4. Build trusted curriculum context.
         # -----------------------------------------
 
         context = build_context(
@@ -333,7 +463,7 @@ class RAGService:
         )
 
         # -----------------------------------------
-        # 5. Resolve governed teaching strategy
+        # 5. Resolve governed teaching strategy.
         # -----------------------------------------
 
         teaching_strategy = (
@@ -343,7 +473,7 @@ class RAGService:
         )
 
         # -----------------------------------------
-        # 6. Build local grounded prompt
+        # 6. Build local grounded prompt.
         # -----------------------------------------
 
         prompt = build_grounded_prompt(
@@ -353,7 +483,7 @@ class RAGService:
         )
 
         # -----------------------------------------
-        # 7. Generate local answer
+        # 7. Generate local answer.
         # -----------------------------------------
 
         answer = self.llm.generate(
@@ -361,8 +491,7 @@ class RAGService:
         ).strip()
 
         # -----------------------------------------
-        # 8. Generation-level grounding guardrail
-        # -----------------------------------------
+        # 8. Generation-level grounding guardrail.
         #
         # Retrieval alone does not prove that the
         # model found enough evidence to answer.
@@ -382,7 +511,7 @@ class RAGService:
             )
 
         # -----------------------------------------
-        # 9. Build curriculum provenance
+        # 9. Build curriculum provenance.
         # -----------------------------------------
 
         sources = []
@@ -423,7 +552,7 @@ class RAGService:
             )
 
         # -----------------------------------------
-        # 10. Return grounded curriculum answer
+        # 10. Return grounded curriculum answer.
         # -----------------------------------------
 
         return {
