@@ -118,9 +118,20 @@ class Settings(BaseSettings):
 
     A4A_WEB_ALLOWED_DOMAINS: str = (
         "docs.python.org,"
+        "pandas.pydata.org,"
+        "numpy.org,"
+        "flask.palletsprojects.com,"
+        "fastapi.tiangolo.com,"
+        "docs.djangoproject.com,"
+        "docs.sqlalchemy.org,"
+        "alembic.sqlalchemy.org,"
         "scikit-learn.org,"
-        "pytorch.org,"
-        "tensorflow.org"
+        "huggingface.co,"
+        "sbert.net,"
+        "requests.readthedocs.io,"
+        "pyyaml.org,"
+        "docs.reportlab.com,"
+        "boto3.amazonaws.com"
     )
 
     # Local SearXNG instance used only for discovering

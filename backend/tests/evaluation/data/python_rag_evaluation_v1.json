@@ -1,0 +1,902 @@
+[
+  {
+    "test_id": "PY-001",
+    "category": "Python fundamentals",
+    "question": "What is a Python dictionary?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-002",
+    "category": "Python fundamentals",
+    "question": "What is the difference between a list and a tuple in Python?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-003",
+    "category": "Python internals",
+    "question": "How does Python's garbage collection work?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-004",
+    "category": "Python advanced",
+    "question": "What are decorators in Python?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-005",
+    "category": "Python advanced",
+    "question": "Explain *args and **kwargs with examples.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-006",
+    "category": "Python advanced",
+    "question": "What is the difference between deep copy and shallow copy?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-007",
+    "category": "Python advanced",
+    "question": "What are Python generators and when should I use them?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-008",
+    "category": "Python advanced",
+    "question": "How do context managers work in Python?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-009",
+    "category": "Python OOP",
+    "question": "What is the purpose of the __init__ method?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-010",
+    "category": "Python advanced",
+    "question": "What are dataclasses in Python?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-011",
+    "category": "Python internals",
+    "question": "Explain Python's GIL.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-012",
+    "category": "Python coding",
+    "question": "Write a function to remove duplicates from a list.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-013",
+    "category": "Python coding",
+    "question": "How can I reverse a string in Python?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-014",
+    "category": "Python coding",
+    "question": "Generate Fibonacci series using recursion.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-015",
+    "category": "Python coding",
+    "question": "Sort a dictionary by its values.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-016",
+    "category": "Python coding",
+    "question": "Find the most frequent element in a list.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-017",
+    "category": "Algorithms",
+    "question": "Implement binary search in Python.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs / authoritative algorithm references"
+  },
+  {
+    "test_id": "PY-018",
+    "category": "Python OOP",
+    "question": "Create a linked list class.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-019",
+    "category": "Python advanced",
+    "question": "Write a decorator to measure execution time.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-020",
+    "category": "Pandas",
+    "question": "Convert a JSON file into a Pandas DataFrame.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "pandas docs"
+  },
+  {
+    "test_id": "PY-021",
+    "category": "Python coding",
+    "question": "Merge two dictionaries.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-022",
+    "category": "Python troubleshooting",
+    "question": "How do I fix 'ModuleNotFoundError'?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-023",
+    "category": "Python troubleshooting",
+    "question": "What causes IndexError: list index out of range?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-024",
+    "category": "Python troubleshooting",
+    "question": "How can I debug a segmentation fault in Python?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-025",
+    "category": "Python troubleshooting",
+    "question": "What is the difference between ValueError and TypeError?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-026",
+    "category": "Python troubleshooting",
+    "question": "Why am I getting 'AttributeError: object has no attribute'?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-027",
+    "category": "Python troubleshooting",
+    "question": "How can I trace memory leaks in Python?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-028",
+    "category": "Python troubleshooting",
+    "question": "Best ways to log exceptions.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-029",
+    "category": "Python troubleshooting",
+    "question": "How do I handle multiple exceptions?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-030",
+    "category": "Python OOP",
+    "question": "Explain inheritance in Python.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-031",
+    "category": "Python OOP",
+    "question": "What is multiple inheritance?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-032",
+    "category": "Python OOP",
+    "question": "How do abstract base classes work?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-033",
+    "category": "Python OOP",
+    "question": "Difference between @staticmethod and @classmethod.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-034",
+    "category": "Python OOP",
+    "question": "What is method overriding?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-035",
+    "category": "Python OOP",
+    "question": "How do Python properties work?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-036",
+    "category": "Python OOP",
+    "question": "Implement a singleton pattern in Python.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-037",
+    "category": "Algorithms",
+    "question": "Implement a stack using Python lists.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs / authoritative algorithm references"
+  },
+  {
+    "test_id": "PY-038",
+    "category": "Algorithms",
+    "question": "Implement a queue using deque.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs / authoritative algorithm references"
+  },
+  {
+    "test_id": "PY-039",
+    "category": "Algorithms",
+    "question": "Find the longest substring without repeating characters.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs / authoritative algorithm references"
+  },
+  {
+    "test_id": "PY-040",
+    "category": "Algorithms",
+    "question": "Detect a cycle in a linked list.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs / authoritative algorithm references"
+  },
+  {
+    "test_id": "PY-041",
+    "category": "Algorithms",
+    "question": "Implement quicksort in Python.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs / authoritative algorithm references"
+  },
+  {
+    "test_id": "PY-042",
+    "category": "Python internals",
+    "question": "What is the time complexity of dictionary lookups?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-043",
+    "category": "Algorithms",
+    "question": "Compare BFS and DFS implementations.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs / authoritative algorithm references"
+  },
+  {
+    "test_id": "PY-044",
+    "category": "Pandas",
+    "question": "How do I read a CSV file using Pandas?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "pandas docs"
+  },
+  {
+    "test_id": "PY-045",
+    "category": "Pandas",
+    "question": "How can I remove duplicate rows?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "pandas docs"
+  },
+  {
+    "test_id": "PY-046",
+    "category": "Pandas",
+    "question": "Difference between loc and iloc.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "pandas docs"
+  },
+  {
+    "test_id": "PY-047",
+    "category": "Pandas",
+    "question": "How do I perform groupby operations?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "pandas docs"
+  },
+  {
+    "test_id": "PY-048",
+    "category": "Pandas",
+    "question": "Merge two DataFrames.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "pandas docs"
+  },
+  {
+    "test_id": "PY-049",
+    "category": "Pandas",
+    "question": "Handle missing values in Pandas.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "pandas docs"
+  },
+  {
+    "test_id": "PY-050",
+    "category": "Pandas",
+    "question": "Convert string dates to datetime.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "pandas docs"
+  },
+  {
+    "test_id": "PY-051",
+    "category": "Pandas",
+    "question": "Optimize large DataFrame operations.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "pandas docs"
+  },
+  {
+    "test_id": "PY-052",
+    "category": "NumPy",
+    "question": "Create a NumPy array from a list.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "NumPy docs"
+  },
+  {
+    "test_id": "PY-053",
+    "category": "NumPy",
+    "question": "Difference between reshape and resize.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "NumPy docs"
+  },
+  {
+    "test_id": "PY-054",
+    "category": "NumPy",
+    "question": "Perform matrix multiplication.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "NumPy docs"
+  },
+  {
+    "test_id": "PY-055",
+    "category": "NumPy",
+    "question": "Find unique values in an array.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "NumPy docs"
+  },
+  {
+    "test_id": "PY-056",
+    "category": "NumPy",
+    "question": "Broadcasting examples in NumPy.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "NumPy docs"
+  },
+  {
+    "test_id": "PY-057",
+    "category": "NumPy",
+    "question": "Compute eigenvalues of a matrix.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "NumPy docs"
+  },
+  {
+    "test_id": "PY-058",
+    "category": "Web APIs",
+    "question": "Create a REST API using Flask.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Flask / FastAPI / Django docs"
+  },
+  {
+    "test_id": "PY-059",
+    "category": "Web APIs",
+    "question": "How do I build APIs with FastAPI?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Flask / FastAPI / Django docs"
+  },
+  {
+    "test_id": "PY-060",
+    "category": "Web APIs",
+    "question": "Flask vs FastAPI comparison.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Flask / FastAPI / Django docs"
+  },
+  {
+    "test_id": "PY-061",
+    "category": "Web APIs",
+    "question": "Handle file uploads in Django.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Flask / FastAPI / Django docs"
+  },
+  {
+    "test_id": "PY-062",
+    "category": "Security",
+    "question": "Implement JWT authentication.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python/web framework security docs"
+  },
+  {
+    "test_id": "PY-063",
+    "category": "Databases",
+    "question": "Connect Python APIs to PostgreSQL.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "SQLAlchemy / Alembic / PostgreSQL / MySQL docs"
+  },
+  {
+    "test_id": "PY-064",
+    "category": "Databases",
+    "question": "Connect Python to MySQL.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "SQLAlchemy / Alembic / PostgreSQL / MySQL docs"
+  },
+  {
+    "test_id": "PY-065",
+    "category": "Databases",
+    "question": "How do transactions work in SQLAlchemy?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "SQLAlchemy / Alembic / PostgreSQL / MySQL docs"
+  },
+  {
+    "test_id": "PY-066",
+    "category": "Databases",
+    "question": "Execute parameterized SQL queries.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "SQLAlchemy / Alembic / PostgreSQL / MySQL docs"
+  },
+  {
+    "test_id": "PY-067",
+    "category": "Databases",
+    "question": "Perform database migrations using Alembic.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "SQLAlchemy / Alembic / PostgreSQL / MySQL docs"
+  },
+  {
+    "test_id": "PY-068",
+    "category": "Databases",
+    "question": "Best practices for connection pooling.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "SQLAlchemy / Alembic / PostgreSQL / MySQL docs"
+  },
+  {
+    "test_id": "PY-069",
+    "category": "Machine learning",
+    "question": "Train a Random Forest model in scikit-learn.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "scikit-learn / Hugging Face / Sentence Transformers docs"
+  },
+  {
+    "test_id": "PY-070",
+    "category": "Machine learning",
+    "question": "How do I preprocess text data?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "scikit-learn / Hugging Face / Sentence Transformers docs"
+  },
+  {
+    "test_id": "PY-071",
+    "category": "Machine learning",
+    "question": "What is TF-IDF?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "scikit-learn / Hugging Face / Sentence Transformers docs"
+  },
+  {
+    "test_id": "PY-072",
+    "category": "Machine learning",
+    "question": "Create embeddings using Sentence Transformers.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "scikit-learn / Hugging Face / Sentence Transformers docs"
+  },
+  {
+    "test_id": "PY-073",
+    "category": "RAG",
+    "question": "Build a semantic search engine.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "official framework/vector DB documentation"
+  },
+  {
+    "test_id": "PY-074",
+    "category": "Machine learning",
+    "question": "How can I fine-tune a Hugging Face model?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "scikit-learn / Hugging Face / Sentence Transformers docs"
+  },
+  {
+    "test_id": "PY-075",
+    "category": "DevOps",
+    "question": "Dockerize a Python application.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Docker / Kubernetes / GitHub Actions docs"
+  },
+  {
+    "test_id": "PY-076",
+    "category": "DevOps",
+    "question": "Create a requirements.txt file.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Docker / Kubernetes / GitHub Actions docs"
+  },
+  {
+    "test_id": "PY-077",
+    "category": "Python fundamentals",
+    "question": "Use virtual environments.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-078",
+    "category": "DevOps",
+    "question": "Deploy FastAPI on Kubernetes.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Docker / Kubernetes / GitHub Actions docs"
+  },
+  {
+    "test_id": "PY-079",
+    "category": "DevOps",
+    "question": "Configure GitHub Actions for Python.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Docker / Kubernetes / GitHub Actions docs"
+  },
+  {
+    "test_id": "PY-080",
+    "category": "Code RAG",
+    "question": "How do I chunk Python source code for embeddings?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "official RAG/vector/code-search documentation"
+  },
+  {
+    "test_id": "PY-081",
+    "category": "Code RAG",
+    "question": "Best embedding models for code search.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "official RAG/vector/code-search documentation"
+  },
+  {
+    "test_id": "PY-082",
+    "category": "Code RAG",
+    "question": "How can I retrieve functions from a large codebase?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "official RAG/vector/code-search documentation"
+  },
+  {
+    "test_id": "PY-083",
+    "category": "RAG",
+    "question": "Explain LangChain retrievers.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "official framework/vector DB documentation"
+  },
+  {
+    "test_id": "PY-084",
+    "category": "RAG",
+    "question": "What is hybrid search in RAG?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "official framework/vector DB documentation"
+  },
+  {
+    "test_id": "PY-085",
+    "category": "RAG",
+    "question": "How do vector databases store embeddings?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "official framework/vector DB documentation"
+  },
+  {
+    "test_id": "PY-086",
+    "category": "RAG",
+    "question": "Compare FAISS and ChromaDB.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "official framework/vector DB documentation"
+  },
+  {
+    "test_id": "PY-087",
+    "category": "RAG",
+    "question": "How can I reduce hallucinations in RAG systems?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "official framework/vector DB documentation"
+  },
+  {
+    "test_id": "PY-088",
+    "category": "RAG",
+    "question": "Implement metadata filtering in vector search.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "official framework/vector DB documentation"
+  },
+  {
+    "test_id": "PY-089",
+    "category": "RAG",
+    "question": "How do I evaluate retrieval accuracy?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "official framework/vector DB documentation"
+  },
+  {
+    "test_id": "PY-090",
+    "category": "Python libraries",
+    "question": "How do I use the requests library?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "official project documentation"
+  },
+  {
+    "test_id": "PY-091",
+    "category": "Python async",
+    "question": "Show an example of async programming using asyncio.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs"
+  },
+  {
+    "test_id": "PY-092",
+    "category": "Python libraries",
+    "question": "How can I send emails using Python?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "official project documentation"
+  },
+  {
+    "test_id": "PY-093",
+    "category": "Python libraries",
+    "question": "Create and read YAML files.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "official project documentation"
+  },
+  {
+    "test_id": "PY-094",
+    "category": "Python libraries",
+    "question": "Generate PDFs using ReportLab.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "official project documentation"
+  },
+  {
+    "test_id": "PY-095",
+    "category": "Cloud",
+    "question": "Upload files to AWS S3 using boto3.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "AWS boto3 docs"
+  },
+  {
+    "test_id": "PY-096",
+    "category": "CSV variants",
+    "question": "How do I read a CSV in Python?",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs / pandas docs"
+  },
+  {
+    "test_id": "PY-097",
+    "category": "CSV variants",
+    "question": "Load CSV file using Pandas.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs / pandas docs"
+  },
+  {
+    "test_id": "PY-098",
+    "category": "CSV variants",
+    "question": "Import CSV data into a DataFrame.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs / pandas docs"
+  },
+  {
+    "test_id": "PY-099",
+    "category": "CSV variants",
+    "question": "Open a CSV in Python.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs / pandas docs"
+  },
+  {
+    "test_id": "PY-100",
+    "category": "CSV variants",
+    "question": "Read spreadsheet data with Pandas.",
+    "expected_scope": "Python ecosystem / technical learning",
+    "expected_grounding": true,
+    "citation_required": true,
+    "source_family": "Python docs / pandas docs"
+  }
+]

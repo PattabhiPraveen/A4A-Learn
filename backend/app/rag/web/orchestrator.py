@@ -79,6 +79,10 @@ _STOP_WORDS = {
 }
 
 
+
+from app.core.logging import logger
+
+
 class WebEvidenceOrchestrator:
     """
     Governed external-evidence fallback pipeline.
@@ -286,10 +290,19 @@ class WebEvidenceOrchestrator:
             text.lower()
         )
 
+        # Normalize explicitly approved word forms.
+        # Avoid broad stemming of technical terminology.
+        word_forms = {
+            "define": "define",
+            "defined": "define",
+            "defining": "define",
+            "defines": "define",
+        }
+
         return {
-            word
+            word_forms.get(word, word)
             for word in words
-            if word not in _STOP_WORDS
+            if word not in _STOP_WORDS and word != "also"
         }
 
     @classmethod
@@ -298,24 +311,26 @@ class WebEvidenceOrchestrator:
         answer: str,
     ) -> list[tuple[int, str]]:
         """
-        Extract the answer text associated with each
+        Extract the answer claim associated with each
         external-source citation.
 
-        Example:
+        A citation normally appears after the sentence it
+        supports, for example:
 
-            Python supports functions [External Source 1].
+            Python supports dictionaries [External Source 1].
 
-        becomes:
+        The sentence-ending punctuation belongs to the claim,
+        not to the boundary preceding the claim.
 
-            [
-                (
-                    1,
-                    "Python supports functions"
-                )
-            ]
+        Therefore terminal punctuation immediately before the
+        citation is removed before sentence-boundary detection.
 
-        The text immediately preceding the citation is
-        treated as the claim supported by that citation.
+        Earlier citations are removed from the claim window so
+        multiple citations supporting the same statement do not
+        become part of the lexical claim itself.
+
+        Citation-only responses intentionally produce an empty
+        claim and are rejected by semantic validation.
         """
 
         if not answer:
@@ -330,22 +345,63 @@ class WebEvidenceOrchestrator:
                 match.group(1)
             )
 
+            # -------------------------------------------------
+            # Everything before this citation is the candidate
+            # claim window.
+            # -------------------------------------------------
+
             preceding = answer[
                 :match.start()
-            ]
+            ].rstrip()
+
+            # -------------------------------------------------
+            # Remove any earlier citation markers from the
+            # candidate claim. This prevents:
+            #
+            #   Claim [External Source 1] Claim2 [External Source 2]
+            #
+            # from treating Source 1 as part of Claim2.
+            # -------------------------------------------------
+
+            preceding = _EXTERNAL_SOURCE_CITATION_PATTERN.sub(
+                "",
+                preceding,
+            ).rstrip()
+
+            # -------------------------------------------------
+            # IMPORTANT:
+            #
+            # If the model generated:
+            #
+            #   "... key:value pairs. [External Source 1]"
+            #
+            # match.start() is immediately after the period.
+            #
+            # Do NOT treat that terminal period as the sentence
+            # boundary. It belongs to the current claim.
+            #
+            # Remove only terminal sentence punctuation before
+            # looking for the PREVIOUS sentence boundary.
+            # -------------------------------------------------
+
+            preceding_for_boundary = re.sub(
+                r"[.!?]+\s*$",
+                "",
+                preceding,
+            ).rstrip()
 
             boundary_positions = [
-                preceding.rfind("."),
-                preceding.rfind("!"),
-                preceding.rfind("?"),
-                preceding.rfind("\n"),
+                preceding_for_boundary.rfind("."),
+                preceding_for_boundary.rfind("!"),
+                preceding_for_boundary.rfind("?"),
+                preceding_for_boundary.rfind("\n"),
             ]
 
             boundary = max(
                 boundary_positions
             )
 
-            claim = preceding[
+            claim = preceding_for_boundary[
                 boundary + 1:
             ].strip()
 
@@ -357,6 +413,7 @@ class WebEvidenceOrchestrator:
             )
 
         return claims
+
 
     @classmethod
     def _claim_has_numeric_support(
@@ -389,9 +446,8 @@ class WebEvidenceOrchestrator:
             if term.isdigit()
         }
 
-        return bool(
-            claim_numbers
-            & evidence_numbers
+        return claim_numbers.issubset(
+            evidence_numbers
         )
 
     @classmethod
@@ -471,22 +527,35 @@ class WebEvidenceOrchestrator:
         # Numeric support
         # -------------------------------------------------
 
-        if cls._claim_has_numeric_support(
-            claim_terms=claim_terms,
-            evidence_terms=evidence_terms,
-        ):
-            return True
+        # Numeric-only claims may use direct numeric support.
+        # Mixed claims must also pass lexical validation.
+        if all(term.isdigit() for term in claim_terms):
+            return cls._claim_has_numeric_support(
+                claim_terms=claim_terms,
+                evidence_terms=evidence_terms,
+            )
 
         # -------------------------------------------------
         # Meaningful lexical overlap
         # -------------------------------------------------
 
-        overlap = (
-            claim_terms
-            & evidence_terms
-        )
+        # Reject unsupported numbers, even when other
+        # claim terms overlap with the evidence.
+        claim_numbers = {
+            term for term in claim_terms
+            if term.isdigit()
+        }
+        evidence_numbers = {
+            term for term in evidence_terms
+            if term.isdigit()
+        }
 
-        return len(overlap) >= 2
+        if not claim_numbers.issubset(evidence_numbers):
+            return False
+
+        # Conservative lexical coverage:
+        # every normalized claim term must be evidenced.
+        return claim_terms.issubset(evidence_terms)
 
     @classmethod
     def _has_semantic_citation_support(
@@ -656,11 +725,13 @@ class WebEvidenceOrchestrator:
             raise
 
         except Exception:
+            logger.info("a4a_web_rag_failure reason=%s", "WEB_SEARCH_ERROR")
             return self._fallback_result(
                 question
             )
 
         if not candidates:
+            logger.info("a4a_web_rag_failure reason=%s", "WEB_NO_CANDIDATES")
             return self._fallback_result(
                 question
             )
@@ -695,6 +766,7 @@ class WebEvidenceOrchestrator:
                 continue
 
         if not evidence:
+            logger.info("a4a_web_rag_failure reason=%s", "WEB_NO_EVIDENCE")
             return self._fallback_result(
                 question
             )
@@ -708,6 +780,7 @@ class WebEvidenceOrchestrator:
         )
 
         if not evidence:
+            logger.info("a4a_web_rag_failure reason=%s", "WEB_NO_EVIDENCE_AFTER_DEDUP")
             return self._fallback_result(
                 question
             )
@@ -721,6 +794,7 @@ class WebEvidenceOrchestrator:
         )
 
         if not context.strip():
+            logger.info("a4a_web_rag_failure reason=%s", "WEB_EMPTY_CONTEXT")
             return self._fallback_result(
                 question
             )
@@ -744,11 +818,13 @@ class WebEvidenceOrchestrator:
             ).strip()
 
         except Exception:
+            logger.info("a4a_web_rag_failure reason=%s", "WEB_GENERATION_ERROR")
             return self._fallback_result(
                 question
             )
 
         if not answer:
+            logger.info("a4a_web_rag_failure reason=%s", "WEB_EMPTY_ANSWER")
             return self._fallback_result(
                 question
             )
@@ -758,6 +834,7 @@ class WebEvidenceOrchestrator:
         # -------------------------------------------------
 
         if WEB_FALLBACK_MESSAGE in answer:
+            logger.info("a4a_web_rag_failure reason=%s", "WEB_MODEL_ABSTENTION")
             return self._fallback_result(
                 question
             )
@@ -769,6 +846,7 @@ class WebEvidenceOrchestrator:
         if not self._has_substantive_answer(
             answer
         ):
+            logger.info("a4a_web_rag_failure reason=%s", "WEB_NON_SUBSTANTIVE_ANSWER")
             return self._fallback_result(
                 question
             )
@@ -777,10 +855,49 @@ class WebEvidenceOrchestrator:
         # 9. Citation contract validation
         # -------------------------------------------------
 
+        # Retry once only when an otherwise substantive
+        # answer has omitted all external citations.
+        # Reuse the original approved evidence context.
+        if not self._extract_citation_numbers(answer):
+            retry_prompt = (
+                prompt
+                + "\n\nFINAL ANSWER REQUIREMENT:\n"
+                + "Answer the learner's original question "
+                + "using only the approved external evidence "
+                + "provided above. Include valid citations "
+                + "such as [External Source 1] immediately "
+                + "after supported factual claims. "
+                + "Use only source numbers present in the "
+                + "approved evidence. Do not invent citations. "
+                + "If evidence is insufficient, return the "
+                + "required fallback message."
+            )
+
+            try:
+                answer = self.llm.generate(
+                    retry_prompt
+                ).strip()
+            except Exception:
+                logger.info("a4a_web_rag_failure reason=%s", "WEB_CITATION_RETRY_ERROR")
+                return self._fallback_result(
+                    question
+                )
+
+            if (
+                not answer
+                or WEB_FALLBACK_MESSAGE in answer
+                or not self._has_substantive_answer(answer)
+            ):
+                logger.info("a4a_web_rag_failure reason=%s", "WEB_CITATION_RETRY_REJECTED")
+                return self._fallback_result(
+                    question
+                )
+
         if not self._has_valid_citations(
             answer=answer,
             evidence_count=len(evidence),
         ):
+            logger.info("a4a_web_rag_failure reason=%s", "WEB_CITATION_INVALID")
             return self._fallback_result(
                 question
             )
@@ -793,6 +910,7 @@ class WebEvidenceOrchestrator:
             answer=answer,
             evidence=evidence,
         ):
+            logger.info("a4a_web_rag_failure reason=%s", "WEB_CLAIM_UNSUPPORTED")
             return self._fallback_result(
                 question
             )
