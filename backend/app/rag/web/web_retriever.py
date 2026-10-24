@@ -6,6 +6,10 @@ from app.core.config import settings
 from app.rag.python_intent import (
     is_python_programming_query,
 )
+from app.rag.web.documentation_registry import (
+    select_documentation_candidate,
+)
+
 from app.rag.web.models import (
     TrustedWebEvidence,
     WebSearchResult,
@@ -494,11 +498,15 @@ class WebRetriever:
                 "Web search question cannot be empty."
             )
 
-        candidates = (
-            self._search_searxng(
+        provider_error = None
+
+        try:
+            candidates = self._search_searxng(
                 normalized_question
             )
-        )
+        except WebRetrievalProviderError as exc:
+            provider_error = exc
+            candidates = []
 
         approved = self.filter_results(
             candidates
@@ -507,6 +515,41 @@ class WebRetriever:
         if approved:
             return approved
 
-        return self._python_docs_fallback(
+        # -------------------------------------------------
+        # Deterministic governed documentation discovery.
+        #
+        # The registry returns only application-controlled
+        # candidate URLs. A candidate is NOT trusted merely
+        # because it exists in the registry; it must still
+        # cross WebSourcePolicy before being returned.
+        # -------------------------------------------------
+
+        registry_candidate = (
+            select_documentation_candidate(
+                normalized_question
+            )
+        )
+
+        if registry_candidate is not None:
+            registry_evidence = (
+                self.source_policy.approve(
+                    registry_candidate
+                )
+            )
+
+            if registry_evidence is not None:
+                return [registry_evidence]
+
+        # Preserve the existing Python documentation
+        # fallback for backward compatibility.
+        fallback = self._python_docs_fallback(
             normalized_question
         )
+
+        if fallback:
+            return fallback
+
+        if provider_error is not None:
+            raise provider_error
+
+        return []
